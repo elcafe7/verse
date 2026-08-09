@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Verse: single-verse rich Bible reader (English editions from Lex)."""
+"""Verse: single-verse rich Bible reader (bundled English editions)."""
 
 import argparse
-import json
 import os
 import re
 import subprocess
@@ -12,14 +11,14 @@ import tty
 
 import rich.box
 from rich.align import Align
-from rich.console import Console
+from rich.console import Console, Group
 from rich.panel import Panel
 from rich.prompt import IntPrompt, Prompt
 from rich.table import Table
 from rich.text import Text
 from rich.theme import Theme
 
-from core.db import EDITIONS, get_neighbor, get_verse, list_editions
+from core.db import EDITIONS, get_neighbor, get_source, get_verse, list_editions
 
 NORM_RE = re.compile(r"[^a-z0-9]+")
 
@@ -130,28 +129,29 @@ def normalize_book(book: str) -> str:
 
 CONFIG_DIR = os.path.expanduser("~/.config/verse")
 DEFAULT_FILE = os.path.join(CONFIG_DIR, "default.txt")
-LEX_CONFIG_FILE = os.path.expanduser("~/.lex_config.json")
+THEME_FILE = os.path.join(CONFIG_DIR, "theme.txt")
 
 
-def load_lex_config() -> dict:
+def load_saved_theme() -> str | None:
     try:
-        with open(LEX_CONFIG_FILE, encoding="utf-8") as config_file:
-            config = json.load(config_file)
-        return config if isinstance(config, dict) else {}
-    except (OSError, json.JSONDecodeError):
-        return {}
+        with open(THEME_FILE, encoding="utf-8") as theme_file:
+            theme = theme_file.read().strip()
+        return theme if theme in {"light", "dark"} else None
+    except OSError:
+        return None
 
 
 def save_theme_preference(theme_mode: str | None) -> None:
-    config = load_lex_config()
-    if theme_mode is None:
-        config.pop("theme", None)
-    else:
-        config["theme"] = theme_mode
     try:
-        with open(LEX_CONFIG_FILE, "w", encoding="utf-8") as config_file:
-            json.dump(config, config_file, indent=2, sort_keys=True)
-            config_file.write("\n")
+        if theme_mode is None:
+            try:
+                os.remove(THEME_FILE)
+            except OSError:
+                pass
+        else:
+            os.makedirs(CONFIG_DIR, exist_ok=True)
+            with open(THEME_FILE, "w", encoding="utf-8") as theme_file:
+                theme_file.write(theme_mode + "\n")
     except OSError:
         pass
 
@@ -194,7 +194,7 @@ def resolve_theme_mode(raw_arguments: list[str]) -> str:
     environment_theme = os.environ.get("LEX_THEME", "").strip().lower()
     if environment_theme in {"light", "dark"}:
         return environment_theme
-    saved_theme = load_lex_config().get("theme")
+    saved_theme = load_saved_theme()
     if saved_theme in {"light", "dark"}:
         return saved_theme
     return detect_terminal_theme()
@@ -402,6 +402,48 @@ def pick_edition_interactive(current: str) -> str | None:
             return editions[idx]
 
 
+def source_ref(ref: str) -> tuple[str, int, int] | None:
+    """Extract (book, chapter, verse) from an edition-prefixed reference."""
+    parts = ref.split(":")
+    if len(parts) != 4:
+        return None
+    return parts[1], int(parts[2]), int(parts[3])
+
+
+def source_panel(book: str, chapter: int, verse: int) -> Panel | None:
+    source = get_source(book, chapter, verse)
+    if not source:
+        return None
+    text, translit, language = source
+    parts = [Align.center(Text(f"\u2500 {language.title()} \u2500", style="ui.meta"))]
+    parts.append(Text(text, style="verse.text", justify="center"))
+    if translit:
+        parts.append(Text("", style="text"))
+        parts.append(Text(translit, style="text.muted", justify="center"))
+    panel_width = max(1, min(88, console.width - 4))
+    return Panel(
+        Group(*parts),
+        border_style="verse.border",
+        padding=(1, 3),
+        width=panel_width,
+    )
+
+
+def render_verse(ref: str, verse_text: str, show_source_on: bool) -> None:
+    interactive = sys.stdin.isatty() and sys.stdout.isatty()
+    if show_source_on:
+        src = source_ref(ref)
+        source = source_panel(*src) if src else None
+        if source:
+            stack = Group(verse_panel(ref, verse_text), source)
+            if interactive:
+                stack = Align.center(stack, vertical="middle", height=max(1, console.height - 2))
+            console.print(stack)
+            return
+        console.print("[warning]No source data for this reference.[/]")
+    show_verse(ref, verse_text, centered=interactive)
+
+
 def format_ref(reference: str) -> str:
     parts = reference.split(":", 2)
     if len(parts) == 3:
@@ -409,17 +451,35 @@ def format_ref(reference: str) -> str:
         return f"{book} {chap_verse} ({edition.upper()})"
     return reference
 
-def show_verse(reference: str, text: str, *, centered: bool = False) -> None:
+def clean_text(text: str) -> str:
+    text = re.sub(r"\\par\b", " ", text)
+    text = re.sub(r"\{\\cf\d+\s+([^{}]*)\}", r"\1", text)
+    text = re.sub(r"\\[a-zA-Z]+\d*\s?", "", text)
+    text = re.sub(r"[\[<][GH]\d+[>\]]", "", text)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\[\[", "[", text)
+    text = re.sub(r"\]\]", "]", text)
     text = re.sub(r"\*[a-z]+", "", text)
+    text = re.sub(r"\byourln\b", "your", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bonld\b", "on", text, flags=re.IGNORECASE)
+    text = re.sub(r"\[/?[a-z]+\]", "", text)
+    text = re.sub(r"\s{2,}", " ", text)
+    return text.strip()
+
+def verse_panel(reference: str, text: str) -> Panel:
+    text = clean_text(text)
     verse = Text(text, style="verse.text", justify="center")
     panel_width = max(1, min(88, console.width - 4))
-    panel = Panel(
+    return Panel(
         verse,
         title=Text(format_ref(reference), style="verse.ref"),
         border_style="verse.border",
         padding=(1, 3),
         width=panel_width,
     )
+
+def show_verse(reference: str, text: str, *, centered: bool = False) -> None:
+    panel = verse_panel(reference, text)
     if centered:
         viewport = Align.center(
             panel,
@@ -478,13 +538,19 @@ def main():
         sys.exit(1)
 
     interactive = sys.stdin.isatty() and sys.stdout.isatty()
-    show_verse(ref, verse_text, centered=interactive)
+    source_on = False
+    render_verse(ref, verse_text, source_on)
     if not interactive:
         return
 
     while True:
         current_theme = "light" if ACTIVE_THEME_MODE == "light" else "dark"
         other_theme = "dark" if current_theme == "light" else "light"
+        source_hint = (
+            "[ui.action.key]s[/] [ui.action.key]source on[/]"
+            if source_on
+            else "[ui.action.key]s[/] [ui.meta]source[/]"
+        )
         console.print(
             "[ui.action.key]\u2190[/] [ui.meta]previous[/]  "
             "[ui.action.key]\u2192[/] [ui.meta]next[/]  "
@@ -492,6 +558,8 @@ def main():
             + other_theme
             + "[/]  "
             "[ui.action.key]v[/] [ui.meta]version[/]  "
+            + source_hint
+            + "  "
             "[ui.action.key]q[/] [ui.meta]quit[/]",
             justify="center",
         )
@@ -504,22 +572,30 @@ def main():
             rebuild_console(new_mode)
             save_theme_preference(new_mode)
             console.clear()
-            show_verse(ref, verse_text, centered=True)
+            render_verse(ref, verse_text, source_on)
+            continue
+        if key.lower() == "s":
+            source_on = not source_on
+            console.clear()
+            render_verse(ref, verse_text, source_on)
             continue
         if key.lower() == "v":
             new_edition = pick_edition_interactive(edition)
             if new_edition and new_edition != edition:
                 edition = new_edition
                 set_default_edition(edition)
+                _, _, rest = ref.partition(":")
+                ref = f"{edition}:{rest}"
                 verse_text = get_verse(edition, ref)
                 if not verse_text:
+                    console.clear()
                     console.print("[warning]Verse not found in that edition.[/]")
                     continue
                 console.clear()
-                show_verse(ref, verse_text, centered=True)
+                render_verse(ref, verse_text, source_on)
             else:
                 console.clear()
-                show_verse(ref, verse_text, centered=True)
+                render_verse(ref, verse_text, source_on)
             continue
         direction = -1 if key in ("\x1b[D", "h") else 1 if key in ("\x1b[C", "l") else 0
         if not direction:
@@ -531,7 +607,7 @@ def main():
             continue
         ref, verse_text = neighbor
         console.clear()
-        show_verse(ref, verse_text, centered=True)
+        render_verse(ref, verse_text, source_on)
 
 if __name__ == "__main__":
     main()

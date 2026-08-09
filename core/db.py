@@ -5,6 +5,7 @@ import sqlite3
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "bible_versions"
+SOURCE_DIR = Path(__file__).resolve().parent.parent / "data" / "source"
 
 
 def _load_editions() -> dict[str, str]:
@@ -89,7 +90,33 @@ def get_verse(edition: str, reference: str) -> str | None:
         row = _try_reference(connection, reference)
         if row is None:
             row = _try_reference(connection, _abbreviate_ref(reference))
+        if row is None:
+            row = _try_reference(connection, reference.replace(":Psalm:", ":Psalms:"))
+        if row is None:
+            row = _try_reference(connection, reference.replace(":Psalms:", ":Psalm:"))
     return row[0] if row else None
+
+
+def get_source(book: str, chapter: int, verse: int) -> tuple[str, str, str] | None:
+    """Return (text, translit, language) for the original-language verse, or None.
+
+    Hebrew is used for the Old Testament and Greek for the New Testament.
+    """
+    if book == "Psalms":
+        book = "Psalm"
+    for language in ("hebrew", "greek"):
+        db_path = SOURCE_DIR / f"{language}.db"
+        if not db_path.is_file():
+            continue
+        with sqlite3.connect(db_path) as connection:
+            row = connection.execute(
+                "SELECT text, translit FROM verses"
+                " WHERE book = ? AND chapter = ? AND verse = ?",
+                (book, chapter, verse),
+            ).fetchone()
+        if row:
+            return (row[0], row[1], language)
+    return None
 
 
 def get_neighbor(

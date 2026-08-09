@@ -1,7 +1,3 @@
 __pycache__/
 *.py[cod]
 .ruff_cache/
-
-# Bible corpus files are local data and may have redistribution restrictions.
-data/bible_versions/*.db
-data/bible_versions/*.db-*

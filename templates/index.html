@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#15130f">
     <meta name="description" content="A focused Bible reader with original-language source text.">
     <title>Verse — A focused Bible reader</title>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg', v=config.ASSET_VERSION) }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v=config.ASSET_VERSION) }}">
+    <script src="{{ url_for('static', filename='app.js', v=config.ASSET_VERSION) }}" defer></script>
   </head>
   <body>
     <div class="grain" aria-hidden="true"></div>
@@ -35,53 +35,60 @@
       <section class="reader" aria-labelledby="reference-title">
         <form class="reference-search" id="reference-form" role="search">
           <label class="sr-only" for="reference-input">Bible reference</label>
-          <input id="reference-input" name="reference" type="search" value="John 3:16" autocomplete="off" spellcheck="false" aria-describedby="search-hint">
+          <div class="reference-input-wrap">
+            <input id="reference-input" name="reference" type="search" value="John 3:16" autocomplete="off" spellcheck="false" aria-describedby="search-hint" aria-autocomplete="list" aria-controls="book-suggestions" aria-expanded="false">
+            <ul class="book-suggestions" id="book-suggestions" role="listbox" aria-label="Bible books" hidden></ul>
+          </div>
           <button type="submit">Read</button>
         </form>
         <p class="search-hint" id="search-hint">Enter a single verse, such as John 3:16 or Ps 23.1</p>
 
-        <div class="reading-stage" id="reading-stage" aria-live="polite" aria-busy="true">
-          <article class="verse-card">
-            <div class="reference-rule">
-              <span></span>
-              <h1 id="reference-title">John 3:16</h1>
-              <span></span>
-            </div>
-            <p class="edition-name" id="edition-name">King James Version</p>
-            <blockquote id="verse-text">
-              <span class="loading-line"></span>
-              <span class="loading-line short"></span>
-            </blockquote>
-          </article>
+        <div class="reading-layout">
+          <button class="nav-button nav-side previous" id="previous-button" type="button" aria-label="Previous verse">
+            <span class="arrow" aria-hidden="true">←</span>
+            <span class="nav-copy"><small>Previous</small><strong id="previous-label">—</strong></span>
+          </button>
 
-          <article class="source-card" id="source-card" hidden>
-            <div class="source-heading">
-              <span></span>
-              <h2 id="source-label">Greek</h2>
-              <span></span>
-            </div>
-            <p class="source-text" id="source-text" dir="auto"></p>
-            <p class="transliteration" id="source-transliteration"></p>
-          </article>
+          <div class="reading-stage" id="reading-stage" aria-live="polite" aria-busy="true">
+            <article class="verse-card">
+              <div class="reference-rule">
+                <span></span>
+                <h1 id="reference-title">John 3:16</h1>
+                <span></span>
+              </div>
+            <p class="edition-name" id="edition-name">Geneva Bible (1587)</p>
+              <blockquote id="verse-text">
+                <span class="loading-line"></span>
+                <span class="loading-line short"></span>
+              </blockquote>
+            </article>
 
-          <div class="error-card" id="error-card" role="alert" hidden>
-            <p id="error-message"></p>
-            <button id="error-retry" type="button">Try again</button>
+            <article class="source-card" id="source-card" hidden>
+              <div class="source-heading">
+                <span></span>
+                <h2 id="source-label">Greek</h2>
+                <span></span>
+              </div>
+              <p class="source-text" id="source-text" dir="auto"></p>
+              <p class="transliteration" id="source-transliteration"></p>
+            </article>
+
+            <div class="error-card" id="error-card" role="alert" hidden>
+              <p id="error-message"></p>
+              <button id="error-retry" type="button">Try again</button>
+            </div>
           </div>
+
+          <button class="nav-button nav-side next" id="next-button" type="button" aria-label="Next verse">
+            <span class="nav-copy"><small>Next</small><strong id="next-label">—</strong></span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </button>
         </div>
 
         <nav class="reader-controls" aria-label="Verse navigation">
-          <button class="nav-button" id="previous-button" type="button">
-            <span class="arrow" aria-hidden="true">←</span>
-            <span><small>Previous</small><strong id="previous-label">—</strong></span>
-          </button>
           <button class="source-toggle" id="source-button" type="button" aria-pressed="false">
             <span class="source-glyph" aria-hidden="true">אα</span>
             <span><strong>Source text</strong><small id="source-status">Hidden</small></span>
-          </button>
-          <button class="nav-button next" id="next-button" type="button">
-            <span><small>Next</small><strong id="next-label">—</strong></span>
-            <span class="arrow" aria-hidden="true">→</span>
           </button>
         </nav>
       </section>

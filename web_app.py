@@ -4,12 +4,13 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from core.db import EDITIONS, get_neighbor, get_source, get_verse, list_editions
-from verse import clean_text, normalize_book
+from verse import BIBLE_BOOKS, clean_text, normalize_book
 
 
 REFERENCE_RE = re.compile(r"(.+?)\s+(\d+)(?:[:.\s]+)(\d+)")
@@ -38,13 +39,14 @@ def split_database_reference(reference: str) -> tuple[str, str, int, int]:
 
 def reference_payload(reference: str) -> dict[str, object]:
     edition, book, chapter, verse = split_database_reference(reference)
+    display_book = normalize_book(book)
     return {
         "canonical": reference,
         "edition": edition,
-        "book": book,
+        "book": display_book,
         "chapter": chapter,
         "verse": verse,
-        "display": f"{book} {chapter}:{verse}",
+        "display": f"{display_book} {chapter}:{verse}",
     }
 
 
@@ -59,7 +61,11 @@ def neighbor_payload(edition: str, reference: str, direction: int) -> dict | Non
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
-    app.config.from_mapping(JSON_SORT_KEYS=False)
+    asset_files = (Path(app.static_folder) / name for name in ("styles.css", "app.js", "favicon.svg"))
+    app.config.from_mapping(
+        JSON_SORT_KEYS=False,
+        ASSET_VERSION=max(int(path.stat().st_mtime) for path in asset_files),
+    )
     if test_config:
         app.config.update(test_config)
 
@@ -94,9 +100,31 @@ def create_app(test_config: dict | None = None) -> Flask:
             ]
         )
 
+    @app.get("/api/books")
+    def books():
+        query = request.args.get("q", "").strip().lower()
+        if not query or len(query) > 40:
+            return jsonify(books=[])
+
+        normalized_query = re.sub(r"[^a-z0-9]+", "", query)
+        if not normalized_query:
+            return jsonify(books=[])
+
+        def rank(book: str) -> tuple[int, int, str]:
+            normalized_book = re.sub(r"[^a-z0-9]+", "", book.lower())
+            if normalized_book.startswith(normalized_query):
+                return (0, len(book), book)
+            if normalized_query in normalized_book:
+                return (1, len(book), book)
+            return (2, len(book), book)
+
+        matches = [book for book in BIBLE_BOOKS if rank(book)[0] < 2]
+        matches.sort(key=rank)
+        return jsonify(books=matches[:8])
+
     @app.get("/api/verse")
     def verse():
-        edition = request.args.get("edition", "kjv").strip().lower()
+        edition = request.args.get("edition", "gen").strip().lower()
         raw_reference = request.args.get("reference", "John 3:16")
         include_source = request.args.get("source", "0").lower() in {
             "1",

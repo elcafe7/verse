@@ -73,7 +73,7 @@ BOOK_ALIASES.update({
     "1ch": "1 Chronicles", "1chr": "1 Chronicles",
     "2ch": "2 Chronicles", "2chr": "2 Chronicles",
     "ezr": "Ezra", "neh": "Nehemiah", "est": "Esther",
-    "ps": "Psalm", "psa": "Psalm", "psalm": "Psalm",
+    "ps": "Psalm", "psa": "Psalm", "psalm": "Psalm", "psalms": "Psalm",
     "pr": "Proverbs", "pro": "Proverbs", "prov": "Proverbs",
     "ec": "Ecclesiastes", "ecc": "Ecclesiastes", "eccl": "Ecclesiastes",
     "song": "Song of Solomon", "sos": "Song of Solomon", "canticles": "Song of Solomon",

@@ -85,20 +85,32 @@ def _abbreviate_ref(reference: str) -> str:
     return reference
 
 
+def _reference_candidates(reference: str) -> list[str]:
+    """Return equivalent database spellings for a canonical reference."""
+    candidates: list[str] = []
+    for candidate in (reference, _abbreviate_ref(reference)):
+        candidates.extend(
+            (
+                candidate,
+                candidate.replace(":Psalm:", ":Psalms:"),
+                candidate.replace(":Psalms:", ":Psalm:"),
+            )
+        )
+    return list(dict.fromkeys(candidates))
+
+
 def get_verse(edition: str, reference: str) -> str | None:
     """Return an exact verse, tolerating case and spacing differences."""
     db_path = DATA_DIR / f"{edition}.db"
     if edition not in EDITIONS or not db_path.is_file():
         return None
 
+    row = None
     with _connect_readonly(db_path) as connection:
-        row = _try_reference(connection, reference)
-        if row is None:
-            row = _try_reference(connection, _abbreviate_ref(reference))
-        if row is None:
-            row = _try_reference(connection, reference.replace(":Psalm:", ":Psalms:"))
-        if row is None:
-            row = _try_reference(connection, reference.replace(":Psalms:", ":Psalm:"))
+        for candidate in _reference_candidates(reference):
+            row = _try_reference(connection, candidate)
+            if row is not None:
+                break
     return row[0] if row else None
 
 
@@ -133,21 +145,17 @@ def get_neighbor(
         return None
 
     with _connect_readonly(db_path) as connection:
-        current = connection.execute(
-            """SELECT id FROM bible
-               WHERE replace(reference, ' ', '') = replace(?, ' ', '')
-                     COLLATE NOCASE
-               LIMIT 1""",
-            (reference,),
-        ).fetchone()
-        if current is None:
+        current = None
+        for candidate in _reference_candidates(reference):
             current = connection.execute(
                 """SELECT id FROM bible
                    WHERE replace(reference, ' ', '') = replace(?, ' ', '')
                          COLLATE NOCASE
                    LIMIT 1""",
-                (_abbreviate_ref(reference),),
+                (candidate,),
             ).fetchone()
+            if current is not None:
+                break
         if current is None:
             return None
 

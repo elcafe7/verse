@@ -1,5 +1,5 @@
 const state = {
-  edition: "kjv",
+  edition: "gen",
   reference: "John 3:16",
   sourceVisible: false,
   neighbors: { previous: null, next: null },
@@ -11,6 +11,7 @@ const elements = {
   stage: document.querySelector("#reading-stage"),
   form: document.querySelector("#reference-form"),
   input: document.querySelector("#reference-input"),
+  suggestions: document.querySelector("#book-suggestions"),
   editionSelect: document.querySelector("#edition-select"),
   referenceTitle: document.querySelector("#reference-title"),
   editionName: document.querySelector("#edition-name"),
@@ -32,6 +33,80 @@ const elements = {
   themeMeta: document.querySelector('meta[name="theme-color"]'),
 };
 
+let suggestionRequest = 0;
+let suggestionTimer = null;
+let activeSuggestion = -1;
+
+function bookQuery(value) {
+  const trimmed = value.trimStart();
+  if (!trimmed || /\s\d+[:.\s]*\d*$/.test(trimmed)) return null;
+  return trimmed.slice(0, 40);
+}
+
+function closeSuggestions() {
+  elements.suggestions.hidden = true;
+  elements.suggestions.replaceChildren();
+  elements.input.setAttribute("aria-expanded", "false");
+  elements.input.removeAttribute("aria-activedescendant");
+  activeSuggestion = -1;
+}
+
+function selectSuggestion(book) {
+  elements.input.value = `${book} `;
+  closeSuggestions();
+  elements.input.focus();
+}
+
+function setActiveSuggestion(index) {
+  const options = [...elements.suggestions.querySelectorAll("[role='option']")];
+  if (!options.length) return;
+  activeSuggestion = (index + options.length) % options.length;
+  options.forEach((option, optionIndex) => {
+    const selected = optionIndex === activeSuggestion;
+    option.setAttribute("aria-selected", String(selected));
+    option.classList.toggle("active", selected);
+  });
+  elements.input.setAttribute("aria-activedescendant", options[activeSuggestion].id);
+  options[activeSuggestion].scrollIntoView({ block: "nearest" });
+}
+
+function renderSuggestions(books) {
+  if (!books.length) {
+    closeSuggestions();
+    return;
+  }
+  elements.suggestions.replaceChildren(
+    ...books.map((book, index) => {
+      const option = document.createElement("li");
+      option.id = `book-suggestion-${index}`;
+      option.role = "option";
+      option.dataset.book = book;
+      option.textContent = book;
+      option.setAttribute("aria-selected", "false");
+      option.addEventListener("mousedown", (event) => event.preventDefault());
+      option.addEventListener("click", () => selectSuggestion(book));
+      return option;
+    }),
+  );
+  elements.suggestions.hidden = false;
+  elements.input.setAttribute("aria-expanded", "true");
+  activeSuggestion = -1;
+}
+
+async function fetchBookSuggestions(query) {
+  const requestNumber = ++suggestionRequest;
+  try {
+    const response = await fetch(`api/books?q=${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error("Book suggestions unavailable.");
+    const data = await response.json();
+    if (requestNumber === suggestionRequest && bookQuery(elements.input.value) === query) {
+      renderSuggestions(data.books);
+    }
+  } catch (_error) {
+    if (requestNumber === suggestionRequest) closeSuggestions();
+  }
+}
+
 function preferredTheme() {
   const saved = localStorage.getItem("verse-theme");
   if (saved === "light" || saved === "dark") return saved;
@@ -48,7 +123,7 @@ function setTheme(theme) {
 function urlState() {
   const params = new URLSearchParams(window.location.search);
   return {
-    edition: params.get("v") || "kjv",
+    edition: params.get("v") || "gen",
     reference: params.get("ref") || "John 3:16",
     sourceVisible: params.get("source") === "1",
   };
@@ -74,7 +149,7 @@ async function loadEditions() {
     }),
   );
   if (!data.editions.some((edition) => edition.id === state.edition)) {
-    state.edition = data.editions[0]?.id || "kjv";
+    state.edition = data.editions.some((edition) => edition.id === "gen") ? "gen" : data.editions[0]?.id;
   }
   elements.editionSelect.value = state.edition;
 }
@@ -168,8 +243,41 @@ function navigate(direction) {
 
 elements.form.addEventListener("submit", (event) => {
   event.preventDefault();
+  closeSuggestions();
   state.reference = elements.input.value;
   loadVerse({ historyMode: "push" });
+});
+
+elements.input.addEventListener("input", () => {
+  window.clearTimeout(suggestionTimer);
+  const query = bookQuery(elements.input.value);
+  if (!query) {
+    suggestionRequest += 1;
+    closeSuggestions();
+    return;
+  }
+  suggestionTimer = window.setTimeout(() => fetchBookSuggestions(query), 120);
+});
+
+elements.input.addEventListener("keydown", (event) => {
+  if (elements.suggestions.hidden) return;
+  const options = [...elements.suggestions.querySelectorAll("[role='option']")];
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    setActiveSuggestion(activeSuggestion + 1);
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    setActiveSuggestion(activeSuggestion - 1);
+  } else if (event.key === "Enter" && activeSuggestion >= 0) {
+    event.preventDefault();
+    selectSuggestion(options[activeSuggestion].dataset.book);
+  } else if (event.key === "Escape") {
+    closeSuggestions();
+  }
+});
+
+elements.input.addEventListener("blur", () => {
+  window.setTimeout(closeSuggestions, 100);
 });
 
 elements.editionSelect.addEventListener("change", () => {
@@ -192,9 +300,16 @@ elements.themeButton.addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.target.matches("input, select, button")) return;
-  if (event.key === "ArrowLeft") navigate("previous");
-  if (event.key === "ArrowRight") navigate("next");
+  const typing = event.target.matches("input, select, textarea, [contenteditable='true']");
+  if (typing) return;
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    navigate("previous");
+  }
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    navigate("next");
+  }
   if (event.key.toLowerCase() === "s") elements.sourceButton.click();
   if (event.key.toLowerCase() === "t") elements.themeButton.click();
   if (event.key === "/") {

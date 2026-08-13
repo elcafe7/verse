@@ -29,7 +29,7 @@ class WebAppTests(unittest.TestCase):
         response = self.client.get("/", headers={"X-Forwarded-Prefix": "/verse"})
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'href="/verse/"', response.data)
-        self.assertIn(b'href="/verse/static/styles.css"', response.data)
+        self.assertIn(b'href="/verse/static/styles.css?v=', response.data)
 
     def test_health(self):
         response = self.client.get("/health")
@@ -42,6 +42,21 @@ class WebAppTests(unittest.TestCase):
         editions = response.get_json()["editions"]
         self.assertEqual(response.status_code, 200)
         self.assertEqual({edition["id"] for edition in editions}, {"esv", "gen", "kj16", "kjv", "nasb"})
+
+    def test_geneva_is_the_api_default(self):
+        response = self.client.get("/api/verse", query_string={"reference": "John 3:16"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["edition"]["id"], "gen")
+
+    def test_book_name_suggestions(self):
+        response = self.client.get("/api/books", query_string={"q": "joh"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["books"][:2], ["John", "1 John"])
+
+        response = self.client.get("/api/books", query_string={"q": "1 cor"})
+        self.assertEqual(
+            response.get_json()["books"], ["1 Corinthians"]
+        )
 
     def test_bundled_databases_work_from_a_read_only_tree(self):
         response = self.client.get(
@@ -89,6 +104,18 @@ class WebAppTests(unittest.TestCase):
         payload = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["source"]["language"], "hebrew")
+
+    def test_psalm_navigation_populates_for_plural_database_references(self):
+        for edition in ("kjv", "kj16"):
+            with self.subTest(edition=edition):
+                response = self.client.get(
+                    "/api/verse",
+                    query_string={"edition": edition, "reference": "Psalm 1:1"},
+                )
+                payload = response.get_json()
+                self.assertEqual(response.status_code, 200)
+                self.assertIsNotNone(payload["neighbors"]["previous"])
+                self.assertEqual(payload["neighbors"]["next"]["display"], "Psalm 1:2")
 
     def test_rejects_unknown_edition(self):
         response = self.client.get(

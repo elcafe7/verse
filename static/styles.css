@@ -19,19 +19,19 @@
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #f4efe4;
-  --bg-deep: #e8dfd0;
-  --surface: rgba(255, 253, 247, 0.86);
-  --surface-solid: #fffdf7;
-  --surface-hover: #f0e8da;
-  --text: #27231d;
-  --muted: #71695e;
-  --faint: #a39a8d;
-  --accent: #a84a2a;
-  --accent-bright: #84351e;
-  --border: rgba(91, 71, 43, 0.2);
-  --border-strong: rgba(91, 71, 43, 0.4);
-  --shadow: 0 28px 80px rgba(75, 56, 33, 0.13);
+  --bg: #ffffff;
+  --bg-deep: #f0f0f0;
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-solid: #ffffff;
+  --surface-hover: #ededed;
+  --text: #080808;
+  --muted: #555555;
+  --faint: #969696;
+  --accent: #202020;
+  --accent-bright: #000000;
+  --border: rgba(0, 0, 0, 0.16);
+  --border-strong: rgba(0, 0, 0, 0.42);
+  --shadow: 0 28px 80px rgba(0, 0, 0, 0.12);
 }
 
 * {
@@ -181,7 +181,7 @@ main {
 }
 
 .reader {
-  width: min(920px, 100%);
+  width: min(1180px, 100%);
 }
 
 .reference-search {
@@ -195,12 +195,18 @@ main {
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
 }
 
+.reference-input-wrap {
+  position: relative;
+  min-width: 0;
+}
+
 .reference-search:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 .reference-search input {
+  width: 100%;
   min-width: 0;
   height: 52px;
   padding: 0 18px;
@@ -210,6 +216,38 @@ main {
   background: transparent;
   font-family: var(--serif);
   font-size: 1.08rem;
+}
+
+.book-suggestions {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  max-height: 260px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface-solid);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+}
+
+.book-suggestions li {
+  padding: 10px 12px;
+  border-radius: 2px;
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 0.96rem;
+  cursor: pointer;
+}
+
+.book-suggestions li:hover,
+.book-suggestions li.active {
+  color: var(--surface-solid);
+  background: var(--accent-bright);
 }
 
 .reference-search input::placeholder {
@@ -245,8 +283,16 @@ main {
   text-align: center;
 }
 
+.reading-layout {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 920px) 112px;
+  align-items: stretch;
+  gap: 18px;
+}
+
 .reading-stage {
   position: relative;
+  min-width: 0;
 }
 
 .verse-card,
@@ -406,10 +452,8 @@ blockquote {
 
 .reader-controls {
   margin-top: 18px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: stretch;
-  gap: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .nav-button,
@@ -428,16 +472,40 @@ blockquote {
 }
 
 .nav-button {
-  padding: 0 18px;
+  padding: 0 14px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
   text-align: left;
 }
 
-.nav-button.next {
-  justify-content: flex-end;
+.nav-button.next .nav-copy {
   text-align: right;
+}
+
+.nav-side {
+  min-width: 0;
+  min-height: 100%;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.nav-side .arrow {
+  font-size: 1.8rem;
+  transition: transform 150ms ease;
+}
+
+.nav-side.previous:hover:not(:disabled) .arrow {
+  transform: translateX(-4px);
+}
+
+.nav-side.next:hover:not(:disabled) .arrow {
+  transform: translateX(4px);
+}
+
+.nav-side .nav-copy {
+  text-align: center;
 }
 
 .nav-button:disabled {
@@ -570,18 +638,26 @@ noscript {
     padding: 46px 28px 50px;
   }
 
-  .reader-controls {
-    grid-template-columns: 1fr 1fr;
+  .reading-layout {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    gap: 7px;
+  }
+
+  .nav-side {
+    padding: 0;
+  }
+
+  .nav-side .nav-copy {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .source-toggle {
     min-height: 56px;
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-
-  .nav-button strong {
-    font-size: 0.8rem;
   }
 
   footer {
@@ -617,10 +693,6 @@ noscript {
 
   blockquote {
     font-size: 1.42rem;
-  }
-
-  .nav-button {
-    padding-inline: 12px;
   }
 
   footer {

@@ -83,6 +83,7 @@ select {
 
 button {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button:focus-visible,
@@ -117,13 +118,13 @@ select:focus-visible {
   box-shadow: inset 0 1px 0 var(--glass-highlight);
   -webkit-backdrop-filter: blur(10px) saturate(135%);
   backdrop-filter: blur(10px) saturate(135%);
-  opacity: 0.7;
+  opacity: 0.5;
   transition: opacity 160ms ease;
 }
 
 .site-header:hover,
 .site-header:focus-within {
-  opacity: 1;
+  opacity: 0.85;
 }
 
 .wordmark {
@@ -232,7 +233,7 @@ main {
   box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow);
   -webkit-backdrop-filter: blur(10px) saturate(135%);
   backdrop-filter: blur(10px) saturate(135%);
-  opacity: 0.7;
+  opacity: 0.5;
   transition: opacity 160ms ease;
 }
 
@@ -244,7 +245,7 @@ main {
 .reference-search:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
-  opacity: 1;
+  opacity: 0.85;
 }
 
 .reference-search input {
@@ -325,7 +326,7 @@ main {
   color: var(--muted);
   font-size: 0.72rem;
   text-align: center;
-  opacity: 0.65;
+  opacity: 0.4;
 }
 
 .reading-layout {
@@ -441,6 +442,7 @@ blockquote {
   margin-top: 18px;
   padding: 38px clamp(30px, 7vw, 76px) 42px;
   text-align: center;
+  opacity: 0.65;
 }
 
 .source-heading {
@@ -501,13 +503,8 @@ blockquote {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 10px;
-  opacity: 0.7;
+  opacity: 0.5;
   transition: opacity 160ms ease;
-}
-
-.reader-controls:hover,
-.reader-controls:focus-within {
-  opacity: 1;
 }
 
 .source-toggle {
@@ -657,7 +654,7 @@ footer {
   color: var(--muted);
   font-size: 0.69rem;
   letter-spacing: 0.04em;
-  opacity: 0.65;
+  opacity: 0.4;
 }
 
 footer p {

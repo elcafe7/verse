@@ -1,0 +1,22 @@
+[Unit]
+Description=Verse web reader
+After=network.target
+
+[Service]
+Type=simple
+User=n8te
+Group=n8te
+WorkingDirectory=/home/n8te/verse
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/n8te/verse/.venv/bin/gunicorn --workers 2 --threads 2 --bind 127.0.0.1:8769 --access-logfile - --error-logfile - web_app:app
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=20
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+NoNewPrivileges=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

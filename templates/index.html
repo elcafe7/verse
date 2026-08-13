@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#15130f">
+    <meta name="description" content="A focused Bible reader with original-language source text.">
+    <title>Verse — A focused Bible reader</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="wordmark" href="{{ url_for('index') }}" aria-label="Verse home">
+        <span class="wordmark-mark" aria-hidden="true">V</span>
+        <span>Verse</span>
+      </a>
+      <div class="header-actions">
+        <label class="select-wrap" aria-label="Bible edition">
+          <select id="edition-select"></select>
+          <span aria-hidden="true">⌄</span>
+        </label>
+        <button class="icon-button" id="theme-button" type="button" aria-label="Use light theme" title="Toggle theme (T)">
+          <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3.5"></circle>
+            <path d="M12 2v2.2M12 19.8V22M4.93 4.93l1.56 1.56M17.51 17.51l1.56 1.56M2 12h2.2M19.8 12H22M4.93 19.07l1.56-1.56M17.51 6.49l1.56-1.56"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="reader" aria-labelledby="reference-title">
+        <form class="reference-search" id="reference-form" role="search">
+          <label class="sr-only" for="reference-input">Bible reference</label>
+          <input id="reference-input" name="reference" type="search" value="John 3:16" autocomplete="off" spellcheck="false" aria-describedby="search-hint">
+          <button type="submit">Read</button>
+        </form>
+        <p class="search-hint" id="search-hint">Enter a single verse, such as John 3:16 or Ps 23.1</p>
+
+        <div class="reading-stage" id="reading-stage" aria-live="polite" aria-busy="true">
+          <article class="verse-card">
+            <div class="reference-rule">
+              <span></span>
+              <h1 id="reference-title">John 3:16</h1>
+              <span></span>
+            </div>
+            <p class="edition-name" id="edition-name">King James Version</p>
+            <blockquote id="verse-text">
+              <span class="loading-line"></span>
+              <span class="loading-line short"></span>
+            </blockquote>
+          </article>
+
+          <article class="source-card" id="source-card" hidden>
+            <div class="source-heading">
+              <span></span>
+              <h2 id="source-label">Greek</h2>
+              <span></span>
+            </div>
+            <p class="source-text" id="source-text" dir="auto"></p>
+            <p class="transliteration" id="source-transliteration"></p>
+          </article>
+
+          <div class="error-card" id="error-card" role="alert" hidden>
+            <p id="error-message"></p>
+            <button id="error-retry" type="button">Try again</button>
+          </div>
+        </div>
+
+        <nav class="reader-controls" aria-label="Verse navigation">
+          <button class="nav-button" id="previous-button" type="button">
+            <span class="arrow" aria-hidden="true">←</span>
+            <span><small>Previous</small><strong id="previous-label">—</strong></span>
+          </button>
+          <button class="source-toggle" id="source-button" type="button" aria-pressed="false">
+            <span class="source-glyph" aria-hidden="true">אα</span>
+            <span><strong>Source text</strong><small id="source-status">Hidden</small></span>
+          </button>
+          <button class="nav-button next" id="next-button" type="button">
+            <span><small>Next</small><strong id="next-label">—</strong></span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </button>
+        </nav>
+      </section>
+    </main>
+
+    <footer>
+      <p>Five editions. Hebrew and Greek source text. Entirely local.</p>
+      <p class="shortcuts"><kbd>←</kbd><kbd>→</kbd> navigate <kbd>S</kbd> source <kbd>T</kbd> theme <kbd>/</kbd> search</p>
+    </footer>
+    <noscript>This reader requires JavaScript to load verses from its local database.</noscript>
+  </body>
+</html>

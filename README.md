@@ -4,6 +4,12 @@ A single-verse terminal Bible reader with original-language source text,
 backed entirely by local SQLite databases. Self-contained — no runtime
 dependency on Lex or any other project.
 
+Verse now includes two interfaces over the same bundled corpus:
+
+- a responsive browser reader with shareable URLs, keyboard navigation,
+  theme and edition controls, and Hebrew/Greek source panels;
+- the original focused terminal reader.
+
 ```sh
 verse -v kjv "John 3:16"
 verse -v nasb "Psalm 23:1"
@@ -39,10 +45,12 @@ The source DBs are extracted from the OpenScriptures ESV interlinear with
 
 ## Install
 
-Requires Python 3 with `rich`.
+Requires Python 3. Install the shared CLI and web dependencies:
 
 ```sh
-pip3 install rich
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
 ln -s "$PWD/verse.py" ~/.local/bin/verse   # or your own launcher
 ```
 
@@ -56,3 +64,38 @@ verse -v esv "Romans 8:28" -dark
 
 Interactive keys: `←` `→` navigate · `t` theme · `v` version · `s` source ·
 `q` quit
+
+## Web app
+
+Start the development server:
+
+```sh
+. .venv/bin/activate
+flask --app web_app run --port 5050
+```
+
+Open `http://127.0.0.1:5050`. The browser UI supports the same five editions,
+reference aliases, adjacent-verse navigation, light/dark themes, and direct
+Hebrew or Greek source display. URLs retain the current edition, reference,
+and source-panel state so a reading can be bookmarked or shared.
+
+The production instance is mounted at `https://poeta.icu/verse/`. Reverse
+proxies should strip the `/verse/` prefix before forwarding and send
+`X-Forwarded-Prefix: /verse`; the application uses that header when generating
+asset and navigation URLs.
+
+For a production WSGI server:
+
+```sh
+gunicorn --workers 2 --bind 127.0.0.1:5050 web_app:app
+```
+
+The SQLite files are read-only at runtime. Place a reverse proxy in front of
+Gunicorn for TLS and public deployment.
+
+## Tests
+
+```sh
+. .venv/bin/activate
+python -m unittest discover -s tests -v
+```

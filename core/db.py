@@ -8,12 +8,17 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "bible_versions"
 SOURCE_DIR = Path(__file__).resolve().parent.parent / "data" / "source"
 
 
+def _connect_readonly(db_path: Path) -> sqlite3.Connection:
+    """Open a bundled database without creating journal or shared-memory files."""
+    return sqlite3.connect(f"{db_path.as_uri()}?mode=ro&immutable=1", uri=True)
+
+
 def _load_editions() -> dict[str, str]:
     editions = {}
     for db_path in sorted(DATA_DIR.glob("*.db")):
         edition = db_path.stem.lower()
         try:
-            with sqlite3.connect(db_path) as connection:
+            with _connect_readonly(db_path) as connection:
                 row = connection.execute(
                     "SELECT value FROM metadata WHERE key = 'edition_name'"
                 ).fetchone()
@@ -86,7 +91,7 @@ def get_verse(edition: str, reference: str) -> str | None:
     if edition not in EDITIONS or not db_path.is_file():
         return None
 
-    with sqlite3.connect(db_path) as connection:
+    with _connect_readonly(db_path) as connection:
         row = _try_reference(connection, reference)
         if row is None:
             row = _try_reference(connection, _abbreviate_ref(reference))
@@ -108,7 +113,7 @@ def get_source(book: str, chapter: int, verse: int) -> tuple[str, str, str] | No
         db_path = SOURCE_DIR / f"{language}.db"
         if not db_path.is_file():
             continue
-        with sqlite3.connect(db_path) as connection:
+        with _connect_readonly(db_path) as connection:
             row = connection.execute(
                 "SELECT text, translit FROM verses"
                 " WHERE book = ? AND chapter = ? AND verse = ?",
@@ -127,7 +132,7 @@ def get_neighbor(
     if edition not in EDITIONS or direction not in (-1, 1):
         return None
 
-    with sqlite3.connect(db_path) as connection:
+    with _connect_readonly(db_path) as connection:
         current = connection.execute(
             """SELECT id FROM bible
                WHERE replace(reference, ' ', '') = replace(?, ' ', '')

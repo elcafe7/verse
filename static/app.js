@@ -2,6 +2,7 @@ const state = {
   edition: "gen",
   reference: "John 3:16",
   sourceVisible: false,
+  minimalMode: localStorage.getItem("verse-minimal") === "1",
   neighbors: { previous: null, next: null },
   requestNumber: 0,
 };
@@ -33,6 +34,8 @@ const elements = {
   nextLabelBottom: document.querySelector("#next-label-bottom"),
   sourceButton: document.querySelector("#source-button"),
   sourceStatus: document.querySelector("#source-status"),
+  minimalButton: document.querySelector("#minimal-button"),
+  minimalStatus: document.querySelector("#minimal-status"),
   themeButton: document.querySelector("#theme-button"),
   themeMeta: document.querySelector('meta[name="theme-color"]'),
 };
@@ -122,6 +125,15 @@ function setTheme(theme) {
   elements.themeButton.setAttribute("aria-label", `Use ${theme === "dark" ? "light" : "dark"} theme`);
   elements.themeMeta.content = theme === "dark" ? "#15130f" : "#ffffff";
   localStorage.setItem("verse-theme", theme);
+}
+
+function setMinimalMode(enabled) {
+  state.minimalMode = enabled;
+  elements.root.classList.toggle("minimal-mode", enabled);
+  elements.minimalButton.setAttribute("aria-pressed", String(enabled));
+  elements.minimalStatus.textContent = enabled ? "On" : "Off";
+  localStorage.setItem("verse-minimal", enabled ? "1" : "0");
+  if (enabled) closeSuggestions();
 }
 
 function urlState() {
@@ -309,6 +321,10 @@ elements.sourceButton.addEventListener("click", () => {
   loadVerse();
 });
 
+elements.minimalButton.addEventListener("click", () => {
+  setMinimalMode(!state.minimalMode);
+});
+
 elements.themeButton.addEventListener("click", () => {
   setTheme(elements.root.dataset.theme === "dark" ? "light" : "dark");
 });
@@ -325,6 +341,7 @@ document.addEventListener("keydown", (event) => {
     navigate("next");
   }
   if (event.key.toLowerCase() === "s") elements.sourceButton.click();
+  if (event.key.toLowerCase() === "m") elements.minimalButton.click();
   if (event.key.toLowerCase() === "t") elements.themeButton.click();
   if (event.key === "/") {
     event.preventDefault();
@@ -341,6 +358,7 @@ window.addEventListener("popstate", () => {
 async function init() {
   Object.assign(state, urlState());
   setTheme(preferredTheme());
+  setMinimalMode(state.minimalMode);
   try {
     await loadEditions();
     await loadVerse();

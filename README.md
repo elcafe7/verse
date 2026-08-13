@@ -76,9 +76,11 @@ flask --app web_app run --port 5050
 
 Open `http://127.0.0.1:5050`. The browser UI supports the same five editions,
 reference aliases, AJAX book-name suggestions, adjacent-verse navigation,
-light/dark themes, and direct Hebrew or Greek source display. Geneva 1587 is
-the default web edition. URLs retain the current edition, reference, and
-source-panel state so a reading can be bookmarked or shared.
+light/dark themes, persistent Minimalist Mode (`M`), and direct Hebrew or Greek
+source display. Minimalist Mode leaves only the verse, floating navigation,
+source control, and its own exit control. Geneva 1587 is the default web
+edition. URLs retain the current edition, reference, and source-panel state so
+a reading can be bookmarked or shared.
 
 The production instance is mounted at `https://poeta.icu/verse/`. Reverse
 proxies should strip the `/verse/` prefix before forwarding and send

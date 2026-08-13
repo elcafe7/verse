@@ -24,6 +24,7 @@ class WebAppTests(unittest.TestCase):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"A focused Bible reader", response.data)
+        self.assertIn(b"Minimalist mode", response.data)
 
     def test_home_page_honors_reverse_proxy_subpath(self):
         response = self.client.get("/", headers={"X-Forwarded-Prefix": "/verse"})

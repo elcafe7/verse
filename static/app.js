@@ -25,8 +25,12 @@ const elements = {
   retry: document.querySelector("#error-retry"),
   previous: document.querySelector("#previous-button"),
   previousLabel: document.querySelector("#previous-label"),
+  previousBottom: document.querySelector("#previous-button-bottom"),
+  previousLabelBottom: document.querySelector("#previous-label-bottom"),
   next: document.querySelector("#next-button"),
   nextLabel: document.querySelector("#next-label"),
+  nextBottom: document.querySelector("#next-button-bottom"),
+  nextLabelBottom: document.querySelector("#next-label-bottom"),
   sourceButton: document.querySelector("#source-button"),
   sourceStatus: document.querySelector("#source-status"),
   themeButton: document.querySelector("#theme-button"),
@@ -116,7 +120,7 @@ function preferredTheme() {
 function setTheme(theme) {
   elements.root.dataset.theme = theme;
   elements.themeButton.setAttribute("aria-label", `Use ${theme === "dark" ? "light" : "dark"} theme`);
-  elements.themeMeta.content = theme === "dark" ? "#15130f" : "#f4efe4";
+  elements.themeMeta.content = theme === "dark" ? "#15130f" : "#ffffff";
   localStorage.setItem("verse-theme", theme);
 }
 
@@ -166,7 +170,9 @@ function showError(message) {
   document.querySelector(".verse-card").hidden = true;
   elements.sourceCard.hidden = true;
   elements.previous.disabled = true;
+  elements.previousBottom.disabled = true;
   elements.next.disabled = true;
+  elements.nextBottom.disabled = true;
 }
 
 function neighborLabel(neighbor) {
@@ -185,9 +191,13 @@ function render(data) {
   elements.editionName.textContent = data.edition.name;
   elements.verseText.textContent = data.text;
   elements.previousLabel.textContent = neighborLabel(data.neighbors.previous);
+  elements.previousLabelBottom.textContent = neighborLabel(data.neighbors.previous);
   elements.nextLabel.textContent = neighborLabel(data.neighbors.next);
+  elements.nextLabelBottom.textContent = neighborLabel(data.neighbors.next);
   elements.previous.disabled = !data.neighbors.previous;
+  elements.previousBottom.disabled = !data.neighbors.previous;
   elements.next.disabled = !data.neighbors.next;
+  elements.nextBottom.disabled = !data.neighbors.next;
   elements.errorCard.hidden = true;
   document.querySelector(".verse-card").hidden = false;
 
@@ -289,7 +299,9 @@ elements.editionSelect.addEventListener("change", () => {
 });
 
 elements.previous.addEventListener("click", () => navigate("previous"));
+elements.previousBottom.addEventListener("click", () => navigate("previous"));
 elements.next.addEventListener("click", () => navigate("next"));
+elements.nextBottom.addEventListener("click", () => navigate("next"));
 elements.retry.addEventListener("click", () => loadVerse());
 
 elements.sourceButton.addEventListener("click", () => {

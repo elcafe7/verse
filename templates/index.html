@@ -44,24 +44,31 @@
         <p class="search-hint" id="search-hint">Enter a single verse, such as John 3:16 or Ps 23.1</p>
 
         <div class="reading-layout">
-          <button class="nav-button nav-side previous" id="previous-button" type="button" aria-label="Previous verse">
-            <span class="arrow" aria-hidden="true">←</span>
-            <span class="nav-copy"><small>Previous</small><strong id="previous-label">—</strong></span>
-          </button>
-
           <div class="reading-stage" id="reading-stage" aria-live="polite" aria-busy="true">
-            <article class="verse-card">
-              <div class="reference-rule">
-                <span></span>
-                <h1 id="reference-title">John 3:16</h1>
-                <span></span>
-              </div>
-            <p class="edition-name" id="edition-name">Geneva Bible (1587)</p>
-              <blockquote id="verse-text">
-                <span class="loading-line"></span>
-                <span class="loading-line short"></span>
-              </blockquote>
-            </article>
+            <div class="verse-shell">
+              <button class="nav-button nav-side previous" id="previous-button" type="button" aria-label="Previous verse">
+                <span class="arrow" aria-hidden="true">←</span>
+                <span class="nav-copy"><small>Previous</small><strong id="previous-label">—</strong></span>
+              </button>
+
+              <article class="verse-card">
+                <div class="reference-rule">
+                  <span></span>
+                  <h1 id="reference-title">John 3:16</h1>
+                  <span></span>
+                </div>
+                <p class="edition-name" id="edition-name">Geneva Bible (1587)</p>
+                <blockquote id="verse-text">
+                  <span class="loading-line"></span>
+                  <span class="loading-line short"></span>
+                </blockquote>
+              </article>
+
+              <button class="nav-button nav-side next" id="next-button" type="button" aria-label="Next verse">
+                <span class="nav-copy"><small>Next</small><strong id="next-label">—</strong></span>
+                <span class="arrow" aria-hidden="true">→</span>
+              </button>
+            </div>
 
             <article class="source-card" id="source-card" hidden>
               <div class="source-heading">
@@ -79,10 +86,6 @@
             </div>
           </div>
 
-          <button class="nav-button nav-side next" id="next-button" type="button" aria-label="Next verse">
-            <span class="nav-copy"><small>Next</small><strong id="next-label">—</strong></span>
-            <span class="arrow" aria-hidden="true">→</span>
-          </button>
         </div>
 
         <nav class="reader-controls" aria-label="Verse navigation">

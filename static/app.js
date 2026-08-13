@@ -165,6 +165,8 @@ function showError(message) {
   elements.errorCard.hidden = false;
   document.querySelector(".verse-card").hidden = true;
   elements.sourceCard.hidden = true;
+  elements.previous.disabled = true;
+  elements.next.disabled = true;
 }
 
 function neighborLabel(neighbor) {

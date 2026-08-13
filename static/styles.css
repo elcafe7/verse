@@ -284,15 +284,16 @@ main {
 }
 
 .reading-layout {
-  display: grid;
-  grid-template-columns: 112px minmax(0, 920px) 112px;
-  align-items: stretch;
-  gap: 18px;
+  width: 100%;
 }
 
 .reading-stage {
   position: relative;
   min-width: 0;
+}
+
+.verse-shell {
+  position: relative;
 }
 
 .verse-card,
@@ -456,7 +457,6 @@ blockquote {
   justify-content: center;
 }
 
-.nav-button,
 .source-toggle {
   min-height: 68px;
   border: 1px solid var(--border);
@@ -464,7 +464,6 @@ blockquote {
   background: var(--surface);
 }
 
-.nav-button:hover:not(:disabled),
 .source-toggle:hover,
 .source-toggle[aria-pressed="true"] {
   border-color: var(--border-strong);
@@ -472,27 +471,39 @@ blockquote {
 }
 
 .nav-button {
-  padding: 0 14px;
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  width: 58px;
+  height: 76px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  text-align: left;
+  border: 0;
+  border-radius: 999px;
+  color: var(--accent-bright);
+  background: transparent;
+  transform: translateY(-50%);
+  transition: background-color 150ms ease, opacity 150ms ease;
 }
 
-.nav-button.next .nav-copy {
-  text-align: right;
+.nav-button.previous {
+  left: -29px;
 }
 
-.nav-side {
-  min-width: 0;
-  min-height: 100%;
-  flex-direction: column;
-  align-self: stretch;
+.nav-button.next {
+  right: -29px;
 }
 
-.nav-side .arrow {
-  font-size: 1.8rem;
+.nav-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--surface-solid) 88%, transparent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.nav-button .arrow {
+  font-size: 2rem;
+  line-height: 1;
   transition: transform 150ms ease;
 }
 
@@ -505,7 +516,13 @@ blockquote {
 }
 
 .nav-side .nav-copy {
-  text-align: center;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 .nav-button:disabled {
@@ -513,7 +530,6 @@ blockquote {
   opacity: 0.42;
 }
 
-.nav-button small,
 .source-toggle small {
   margin-bottom: 4px;
   display: block;
@@ -524,17 +540,11 @@ blockquote {
   text-transform: uppercase;
 }
 
-.nav-button strong,
 .source-toggle strong {
   display: block;
   font-family: var(--serif);
   font-size: 0.9rem;
   font-weight: 500;
-}
-
-.arrow {
-  color: var(--accent-bright);
-  font-size: 1.4rem;
 }
 
 .source-toggle {
@@ -638,22 +648,21 @@ noscript {
     padding: 46px 28px 50px;
   }
 
-  .reading-layout {
-    grid-template-columns: 44px minmax(0, 1fr) 44px;
-    gap: 7px;
+  .nav-button {
+    width: 42px;
+    height: 64px;
   }
 
-  .nav-side {
-    padding: 0;
+  .nav-button.previous {
+    left: -4px;
   }
 
-  .nav-side .nav-copy {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
+  .nav-button.next {
+    right: -4px;
+  }
+
+  .nav-button .arrow {
+    font-size: 1.75rem;
   }
 
   .source-toggle {

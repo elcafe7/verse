@@ -8,6 +8,7 @@ import subprocess
 import sys
 import termios
 import tty
+import unicodedata
 
 import rich.box
 from rich.align import Align
@@ -415,6 +416,11 @@ def source_panel(book: str, chapter: int, verse: int) -> Panel | None:
     if not source:
         return None
     text, translit, language = source
+    text = unicodedata.normalize("NFC", text)
+    translit = unicodedata.normalize("NFC", translit or "")
+    if language == "hebrew":
+        text = "\u200e" + text
+        translit = "\u200e" + translit if translit else translit
     parts = [Align.center(Text(f"\u2500 {language.title()} \u2500", style="ui.meta"))]
     parts.append(Text(text, style="verse.text", justify="center"))
     if translit:

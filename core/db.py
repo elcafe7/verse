@@ -114,11 +114,40 @@ def get_verse(edition: str, reference: str) -> str | None:
     return row[0] if row else None
 
 
+GEN_ABBR_TO_FULL = {
+    "1Chr": "1 Chronicles", "1Cor": "1 Corinthians", "1John": "1 John",
+    "1Kgs": "1 Kings", "1Pet": "1 Peter", "1Sam": "1 Samuel",
+    "1Thess": "1 Thessalonians", "1Tim": "1 Timothy",
+    "2Chr": "2 Chronicles", "2Cor": "2 Corinthians", "2John": "2 John",
+    "2Kgs": "2 Kings", "2Pet": "2 Peter", "2Sam": "2 Samuel",
+    "2Thess": "2 Thessalonians", "2Tim": "2 Timothy", "3John": "3 John",
+    "Acts": "Acts", "Amos": "Amos", "Col": "Colossians", "Dan": "Daniel",
+    "Deut": "Deuteronomy", "Eccl": "Ecclesiastes", "Eph": "Ephesians",
+    "Esth": "Esther", "Exod": "Exodus", "Ezek": "Ezekiel", "Ezra": "Ezra",
+    "Gal": "Galatians", "Gen": "Genesis", "Hab": "Habakkuk", "Hag": "Haggai",
+    "Heb": "Hebrews", "Hos": "Hosea", "Isa": "Isaiah", "Jas": "James",
+    "Jer": "Jeremiah", "Job": "Job", "Joel": "Joel", "John": "John",
+    "Jonah": "Jonah", "Josh": "Joshua", "Jude": "Jude", "Judg": "Judges",
+    "Lam": "Lamentations", "Lev": "Leviticus", "Luke": "Luke", "Mal": "Malachi",
+    "Mark": "Mark", "Matt": "Matthew", "Mic": "Micah", "Nah": "Nahum",
+    "Neh": "Nehemiah", "Num": "Numbers", "Obad": "Obadiah", "Phil": "Philippians",
+    "Phlm": "Philemon", "Prov": "Proverbs", "Ps": "Psalm", "Rev": "Revelation",
+    "Rom": "Romans", "Ruth": "Ruth", "Song": "Song of Solomon",
+    "Titus": "Titus", "Zech": "Zechariah", "Zeph": "Zephaniah",
+}
+
+
 def get_source(book: str, chapter: int, verse: int) -> tuple[str, str, str] | None:
     """Return (text, translit, language) for the original-language verse, or None.
 
     Hebrew is used for the Old Testament and Greek for the New Testament.
+    Book abbreviations (as stored in Geneva edition refs) are mapped to the
+    full names used by the source DBs so the source toggle works for every
+    English edition regardless of naming.
     """
+    book = GEN_ABBR_TO_FULL.get(book, book)
+    if book == "Psalm":
+        book = "Psalm"
     if book == "Psalms":
         book = "Psalm"
     for language in ("hebrew", "greek"):

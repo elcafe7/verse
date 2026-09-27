@@ -102,3 +102,19 @@ Gunicorn for TLS and public deployment.
 . .venv/bin/activate
 python -m unittest discover -s tests -v
 ```
+
+## Offline build
+
+Going off-grid? Grab the fully-offline reader (KJV + Geneva 1587 with
+Apocrypha + Hebrew/Greek sources, no dependencies, no internet needed):
+
+**[Download verse-offline-20260927.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.tar.gz)**
+
+```sh
+tar -xzf verse-offline-20260927.tar.gz
+xdg-open dist/index.html   # works over file://, USB stick, airplane mode
+```
+
+Built from the private `verse_web` repo (`offline/build_offline.py`, stdlib
+only) and attached to the
+[offline-20260927 release](https://github.com/elcafe7/verse/releases/tag/offline-20260927).

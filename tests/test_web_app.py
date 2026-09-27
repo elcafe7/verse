@@ -130,6 +130,18 @@ class WebAppTests(unittest.TestCase):
                 self.assertIsNotNone(payload["neighbors"]["previous"])
                 self.assertEqual(payload["neighbors"]["next"]["display"], "Psalm 1:2")
 
+    def test_reads_geneva_apocrypha_by_full_book_name(self):
+        for reference in ("Tobit 1:1", "2 Maccabees 15:39"):
+            with self.subTest(reference=reference):
+                response = self.client.get(
+                    "/api/verse",
+                    query_string={"edition": "gen", "reference": reference},
+                )
+                payload = response.get_json()
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue(payload["text"])
+                self.assertIsNone(payload["source"])
+
     def test_rejects_unknown_edition(self):
         response = self.client.get(
             "/api/verse", query_string={"edition": "unknown", "reference": "John 3:16"}

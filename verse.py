@@ -121,6 +121,14 @@ BOOK_ALIASES.update({
     "2jn": "2 John", "2jhn": "2 John",
     "3jn": "3 John", "3jhn": "3 John",
     "rev": "Revelation", "rv": "Revelation", "re": "Revelation", "revelations": "Revelation",
+    # Apocrypha present in the Geneva 1587 and KJ1611 corpora.
+    "tob": "Tobit", "tobit": "Tobit",
+    "jdt": "Judith", "judith": "Judith",
+    "wis": "Wisdom of Solomon", "wisdomofsolomon": "Wisdom of Solomon",
+    "sir": "Ecclesiasticus", "ecclesiasticus": "Ecclesiasticus", "sirach": "Ecclesiasticus",
+    "bar": "Baruch", "baruch": "Baruch",
+    "1macc": "1 Maccabees", "1maccabees": "1 Maccabees",
+    "2macc": "2 Maccabees", "2maccabees": "2 Maccabees",
 })
 
 

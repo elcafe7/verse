@@ -56,6 +56,10 @@ BOOK_TO_ABBR = {
     "James": "Jas", "1 Peter": "1Pet", "2 Peter": "2Pet",
     "1 John": "1John", "2 John": "2John", "3 John": "3John",
     "Jude": "Jude", "Revelation": "Rev",
+    # Apocrypha abbreviations as stored in the Geneva 1587 database.
+    "Tobit": "Tob", "Judith": "Jdt", "Wisdom of Solomon": "Wis",
+    "Ecclesiasticus": "Sir", "Baruch": "Bar",
+    "1 Maccabees": "1Macc", "2 Maccabees": "2Macc",
 }
 
 

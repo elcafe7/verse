@@ -709,6 +709,15 @@ footer p {
   gap: 7px;
 }
 
+.offline-note a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.offline-note a:hover {
+  color: var(--accent-bright);
+}
+
 kbd {
   min-width: 22px;
   height: 22px;

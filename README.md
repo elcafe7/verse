@@ -15,6 +15,25 @@ verse -v kjv "John 3:16"
 verse -v nasb "Psalm 23:1"
 ```
 
+## Offline HTML build
+
+Going off-grid? Grab the offline HTML build (KJV + KJ1611 with Apocrypha +
+Geneva 1587 with Apocrypha + Hebrew/Greek sources, no dependencies, no
+internet needed):
+
+**[Download verse-offline-20260927.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.tar.gz)**
+(no tar handy? grab the
+[.zip instead](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.zip))
+
+```sh
+tar -xzf verse-offline-20260927.tar.gz
+xdg-open dist/index.html   # works over file://, USB stick, airplane mode
+```
+
+Built from the private `verse_web` repo (`offline/build_offline.py`, stdlib
+only) and attached to the
+[offline-20260927 release](https://github.com/elcafe7/verse/releases/tag/offline-20260927).
+
 ## Features
 
 - **Five English editions** bundled: KJV, KJ1611 (`kj16`), Geneva 1587
@@ -102,22 +121,3 @@ Gunicorn for TLS and public deployment.
 . .venv/bin/activate
 python -m unittest discover -s tests -v
 ```
-
-## Offline HTML build
-
-Going off-grid? Grab the offline HTML build (KJV + KJ1611 with Apocrypha +
-Geneva 1587 with Apocrypha + Hebrew/Greek sources, no dependencies, no
-internet needed):
-
-**[Download verse-offline-20260927.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.tar.gz)**
-(no tar handy? grab the
-[.zip instead](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.zip))
-
-```sh
-tar -xzf verse-offline-20260927.tar.gz
-xdg-open dist/index.html   # works over file://, USB stick, airplane mode
-```
-
-Built from the private `verse_web` repo (`offline/build_offline.py`, stdlib
-only) and attached to the
-[offline-20260927 release](https://github.com/elcafe7/verse/releases/tag/offline-20260927).

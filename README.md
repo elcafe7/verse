@@ -103,9 +103,9 @@ Gunicorn for TLS and public deployment.
 python -m unittest discover -s tests -v
 ```
 
-## Offline build
+## Offline HTML build
 
-Going off-grid? Grab the fully-offline reader (KJV + Geneva 1587 with
+Going off-grid? Grab the offline HTML build (KJV + Geneva 1587 with
 Apocrypha + Hebrew/Greek sources, no dependencies, no internet needed):
 
 **[Download verse-offline-20260927.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.tar.gz)**

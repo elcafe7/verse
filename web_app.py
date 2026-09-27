@@ -87,6 +87,20 @@ def create_app(test_config: dict | None = None) -> Flask:
     def index():
         return render_template("index.html")
 
+    @app.get("/api/<path:_unused>")
+    def api_not_found(_unused):
+        # More specific than the pretty-reader catch-all below, so unknown
+        # API paths stay JSON 404s instead of booting the reader shell.
+        return jsonify(error="API endpoint not found."), 404
+
+    @app.get("/<edition>/<path:ref>")
+    @app.get("/<path:ref>")
+    def reader(edition=None, ref=None):
+        # Pretty share URLs (/verse/kjv/Ps-23-1). The single-page shell
+        # parses the path itself; /api/*, /static/*, and /health keep their
+        # own routes above, everything else boots the reader with HTTP 200.
+        return render_template("index.html")
+
     @app.get("/health")
     def health():
         return jsonify(status="ok", editions=len(EDITIONS))

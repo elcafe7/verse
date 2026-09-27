@@ -136,20 +136,62 @@ function setMinimalMode(enabled) {
   if (enabled) closeSuggestions();
 }
 
+const KNOWN_EDITIONS = ["esv", "gen", "kj16", "kjv", "nasb"];
+
+function mountPrefix() {
+  const pathname = window.location.pathname;
+  const mountEnd = pathname.indexOf("/verse/");
+  if (mountEnd >= 0) return pathname.slice(0, mountEnd + "/verse/".length);
+  if (pathname === "/verse") return "/verse/";
+  return "/";
+}
+
+function prettyRef(reference) {
+  const match = reference.trim().match(/^(.+?)\s+(\d+)\s*[:.\s]\s*(\d+)\s*$/);
+  if (!match) return null;
+  return `${match[1].trim().replace(/\s+/g, "-")}-${match[2]}-${match[3]}`;
+}
+
+function parsePrettyRef(slug) {
+  const match = slug.match(/^(.+)-(\d+)-(\d+)$/);
+  if (!match || !match[1]) return null;
+  const book = match[1].replace(/-/g, " ");
+  return `${book} ${match[2]}:${match[3]}`;
+}
+
 function urlState() {
   const params = new URLSearchParams(window.location.search);
+  const sourceVisible = params.get("source") === "1";
+  // Legacy share links (?v=&ref=) keep working and canonicalize on load.
+  if (params.get("v") || params.get("ref")) {
+    return {
+      edition: params.get("v") || "gen",
+      reference: params.get("ref") || "John 3:16",
+      sourceVisible,
+    };
+  }
+  // Pretty paths: /verse/John-3-16 or /verse/kjv/Ps-23-1
+  const segs = window.location.pathname.replace(/\/+$/, "").split("/").filter(Boolean);
+  if (segs[0] === "verse") segs.shift();
+  let edition = "gen";
+  let slug = segs.length ? segs[segs.length - 1] : "";
+  if (segs.length >= 2 && KNOWN_EDITIONS.includes(segs[segs.length - 2].toLowerCase())) {
+    edition = segs[segs.length - 2].toLowerCase();
+  }
+  const reference = parsePrettyRef(slug);
   return {
-    edition: params.get("v") || "gen",
-    reference: params.get("ref") || "John 3:16",
-    sourceVisible: params.get("source") === "1",
+    edition,
+    reference: reference || "John 3:16",
+    sourceVisible,
   };
 }
 
 function updateUrl(mode = "replace") {
-  const params = new URLSearchParams({ v: state.edition, ref: state.reference });
-  if (state.sourceVisible) params.set("source", "1");
+  const slug = prettyRef(state.reference) || "John-3-16";
+  const source = state.sourceVisible ? "?source=1" : "";
+  const url = `${mountPrefix()}${state.edition}/${slug}${source}`;
   const method = mode === "push" ? "pushState" : "replaceState";
-  window.history[method]({}, "", `${window.location.pathname}?${params}`);
+  window.history[method]({}, "", url);
 }
 
 async function loadEditions() {

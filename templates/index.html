@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#15130f">
     <meta name="description" content="A focused Bible reader with original-language source text.">
+    <base href="{{ request.script_root }}/">
     <title>Verse — A focused Bible reader</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.svg', v=config.ASSET_VERSION) }}" type="image/svg+xml">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v=config.ASSET_VERSION) }}">

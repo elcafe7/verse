@@ -32,6 +32,18 @@ class WebAppTests(unittest.TestCase):
         self.assertIn(b'href="/verse/"', response.data)
         self.assertIn(b'href="/verse/static/styles.css?v=', response.data)
 
+    def test_pretty_share_urls_boot_reader_with_200(self):
+        for path in ("/John-3-16", "/kjv/Ps-23-1", "/gen/1-John-3-16"):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(b"A focused Bible reader", response.data)
+
+    def test_pretty_routes_do_not_swallow_api(self):
+        response = self.client.get("/api/nope")
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("error", response.get_json())
+
     def test_health(self):
         response = self.client.get("/health")
         self.assertEqual(response.status_code, 200)

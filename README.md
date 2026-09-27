@@ -110,6 +110,8 @@ Geneva 1587 with Apocrypha + Hebrew/Greek sources, no dependencies, no
 internet needed):
 
 **[Download verse-offline-20260927.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.tar.gz)**
+(no tar handy? grab the
+[.zip instead](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.zip))
 
 ```sh
 tar -xzf verse-offline-20260927.tar.gz

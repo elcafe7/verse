@@ -6,8 +6,8 @@ dependency on Lex or any other project.
 
 Verse now includes two interfaces over the same bundled corpus:
 
-- a responsive browser reader with shareable URLs, keyboard navigation,
-  theme and edition controls, and Hebrew/Greek source panels;
+- a responsive browser reader with shareable URLs, swipe and keyboard
+  navigation, theme and edition controls, and Hebrew/Greek source panels;
 - the original focused terminal reader.
 
 ```sh

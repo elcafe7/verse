@@ -358,6 +358,19 @@ elements.next.addEventListener("click", () => navigate("next"));
 elements.nextBottom.addEventListener("click", () => navigate("next"));
 elements.retry.addEventListener("click", () => loadVerse());
 
+// Match the comic reader's touch navigation: swipe left/right by 40px.
+let touchStartX = null;
+document.addEventListener("touchstart", (event) => {
+  touchStartX = event.changedTouches[0].clientX;
+}, { passive: true });
+document.addEventListener("touchend", (event) => {
+  if (touchStartX === null) return;
+  const deltaX = event.changedTouches[0].clientX - touchStartX;
+  if (deltaX < -40) navigate("next");
+  else if (deltaX > 40) navigate("previous");
+  touchStartX = null;
+}, { passive: true });
+
 elements.sourceButton.addEventListener("click", () => {
   state.sourceVisible = !state.sourceVisible;
   loadVerse();

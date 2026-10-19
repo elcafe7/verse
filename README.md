@@ -18,7 +18,7 @@ verse -v nasb "Psalm 23:1"
 ## Offline HTML build
 
 Going off-grid? Grab the offline HTML build (KJV + KJ1611 with Apocrypha +
-Geneva 1587 with Apocrypha + Hebrew/Greek sources, no dependencies, no
+Geneva 1599 with Apocrypha + Hebrew/Greek sources, no dependencies, no
 internet needed):
 
 **[Download verse-offline-20260927.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.tar.gz)**
@@ -36,7 +36,7 @@ only) and attached to the
 
 ## Features
 
-- **Five English editions** bundled: KJV, KJ1611 (`kj16`), Geneva 1587
+- **Five English editions** bundled: KJV, KJ1611 (`kj16`), Geneva 1599
   (`gen`), ESV, NASB — exact verse lookup with tolerant book aliases
   (`verse -v kjv "Psalm 23:1"`).
 - **Original-language toggle** (`s` in interactive mode): shows the Hebrew
@@ -97,7 +97,7 @@ Open `http://127.0.0.1:5050`. The browser UI supports the same five editions,
 reference aliases, AJAX book-name suggestions, adjacent-verse navigation,
 light/dark themes, persistent Minimalist Mode (`M`), and direct Hebrew or Greek
 source display. Minimalist Mode leaves only the verse, floating navigation,
-source control, and its own exit control. Geneva 1587 is the default web
+source control, and its own exit control. Geneva 1599 is the default web
 edition. URLs retain the current edition, reference, and source-panel state so
 a reading can be bookmarked or shared.
 

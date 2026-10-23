@@ -21,18 +21,18 @@ Going off-grid? Grab the offline HTML build (KJV + KJ1611 with Apocrypha +
 Geneva 1599 with Apocrypha + Hebrew/Greek sources, no dependencies, no
 internet needed):
 
-**[Download verse-offline-20260927.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.tar.gz)**
+**[Download verse-offline-20261023.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20261023/verse-offline-20261023.tar.gz)**
 (no tar handy? grab the
-[.zip instead](https://github.com/elcafe7/verse/releases/download/offline-20260927/verse-offline-20260927.zip))
+[.zip instead](https://github.com/elcafe7/verse/releases/download/offline-20261023/verse-offline-20261023.zip))
 
 ```sh
-tar -xzf verse-offline-20260927.tar.gz
+tar -xzf verse-offline-20261023.tar.gz
 xdg-open dist/index.html   # works over file://, USB stick, airplane mode
 ```
 
 Built from the private `verse_web` repo (`offline/build_offline.py`, stdlib
 only) and attached to the
-[offline-20260927 release](https://github.com/elcafe7/verse/releases/tag/offline-20260927).
+[offline-20261023 release](https://github.com/elcafe7/verse/releases/tag/offline-20261023).
 
 ## Features
 

@@ -136,7 +136,7 @@ function setMinimalMode(enabled) {
   if (enabled) closeSuggestions();
 }
 
-const KNOWN_EDITIONS = ["esv", "gen", "kj16", "kjv", "nasb"];
+const KNOWN_EDITIONS = ["gen", "kj16", "kjv"];
 
 function mountPrefix() {
   const pathname = window.location.pathname;

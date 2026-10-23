@@ -12,7 +12,7 @@ Verse now includes two interfaces over the same bundled corpus:
 
 ```sh
 verse -v kjv "John 3:16"
-verse -v nasb "Psalm 23:1"
+verse -v gen "Psalm 23:1"
 ```
 
 ## Offline HTML build
@@ -36,8 +36,8 @@ only) and attached to the
 
 ## Features
 
-- **Five English editions** bundled: KJV, KJ1611 (`kj16`), Geneva 1599
-  (`gen`), ESV, NASB — exact verse lookup with tolerant book aliases
+- **Three English editions** bundled: KJV, KJ1611 (`kj16`) and Geneva 1599
+  (`gen`) — exact verse lookup with tolerant book aliases
   (`verse -v kjv "Psalm 23:1"`).
 - **Original-language toggle** (`s` in interactive mode): shows the Hebrew
   (Old Testament) or Greek (New Testament) source verse with transliteration
@@ -78,7 +78,7 @@ ln -s "$PWD/verse.py" ~/.local/bin/verse   # or your own launcher
 ```sh
 verse -v kjv "John 3:16"    # one-shot read
 verse                       # interactive: prompts for edition + reference
-verse -v esv "Romans 8:28" -dark
+verse -v kj16 "Romans 8:28" -dark
 ```
 
 Interactive keys: `←` `→` navigate · `t` theme · `v` version · `s` source ·
@@ -93,7 +93,7 @@ Start the development server:
 flask --app web_app run --port 5050
 ```
 
-Open `http://127.0.0.1:5050`. The browser UI supports the same five editions,
+Open `http://127.0.0.1:5050`. The browser UI supports the same three editions,
 reference aliases, AJAX book-name suggestions, adjacent-verse navigation,
 light/dark themes, persistent Minimalist Mode (`M`), and direct Hebrew or Greek
 source display. Minimalist Mode leaves only the verse, floating navigation,

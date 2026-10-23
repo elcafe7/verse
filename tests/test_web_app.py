@@ -48,13 +48,13 @@ class WebAppTests(unittest.TestCase):
         response = self.client.get("/health")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["status"], "ok")
-        self.assertEqual(response.get_json()["editions"], 5)
+        self.assertEqual(response.get_json()["editions"], 3)
 
     def test_editions(self):
         response = self.client.get("/api/editions")
         editions = response.get_json()["editions"]
         self.assertEqual(response.status_code, 200)
-        self.assertEqual({edition["id"] for edition in editions}, {"esv", "gen", "kj16", "kjv", "nasb"})
+        self.assertEqual({edition["id"] for edition in editions}, {"gen", "kj16", "kjv"})
 
     def test_geneva_is_the_api_default(self):
         response = self.client.get("/api/verse", query_string={"reference": "John 3:16"})
@@ -73,10 +73,10 @@ class WebAppTests(unittest.TestCase):
 
     def test_bundled_databases_work_from_a_read_only_tree(self):
         response = self.client.get(
-            "/api/verse", query_string={"edition": "esv", "reference": "John 3:16"}
+            "/api/verse", query_string={"edition": "kj16", "reference": "John 3:16"}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("God so loved the world", response.get_json()["text"])
+        self.assertIn("God so loued", response.get_json()["text"])
 
     def test_reads_a_verse_with_navigation(self):
         response = self.client.get(
@@ -94,7 +94,7 @@ class WebAppTests(unittest.TestCase):
         response = self.client.get(
             "/api/verse",
             query_string={
-                "edition": "esv",
+                "edition": "gen",
                 "reference": "John 3:16",
                 "source": "1",
             },
@@ -109,7 +109,7 @@ class WebAppTests(unittest.TestCase):
         response = self.client.get(
             "/api/verse",
             query_string={
-                "edition": "nasb",
+                "edition": "kjv",
                 "reference": "Psalms 23:1",
                 "source": "true",
             },
@@ -143,11 +143,14 @@ class WebAppTests(unittest.TestCase):
                 self.assertIsNone(payload["source"])
 
     def test_rejects_unknown_edition(self):
-        response = self.client.get(
-            "/api/verse", query_string={"edition": "unknown", "reference": "John 3:16"}
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("Unknown edition", response.get_json()["error"])
+        # ESV and NASB are no longer bundled and must be rejected cleanly.
+        for edition in ("unknown", "esv", "nasb"):
+            with self.subTest(edition=edition):
+                response = self.client.get(
+                    "/api/verse", query_string={"edition": edition, "reference": "John 3:16"}
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertIn("Unknown edition", response.get_json()["error"])
 
     def test_reports_missing_verse(self):
         response = self.client.get(

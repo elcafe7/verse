@@ -506,8 +506,8 @@ def show_verse(reference: str, text: str, *, centered: bool = False) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description="Single-verse Bible reader")
-    parser.add_argument("reference", nargs="*", help="Reference e.g. John 3:16 or esv:John:3:16")
-    parser.add_argument("-v", "--version", help="Edition (esv,nasb,kjv,gen,kj16)")
+    parser.add_argument("reference", nargs="*", help="Reference e.g. John 3:16 or kjv:John:3:16")
+    parser.add_argument("-v", "--version", help="Edition (kjv,kj16,gen)")
     theme_group = parser.add_mutually_exclusive_group()
     theme_group.add_argument("-light", dest="theme_mode", action="store_const", const="light")
     theme_group.add_argument("-dark", dest="theme_mode", action="store_const", const="dark")

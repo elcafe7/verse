@@ -101,8 +101,7 @@ source control, and its own exit control. Geneva 1599 is the default web
 edition. URLs retain the current edition, reference, and source-panel state so
 a reading can be bookmarked or shared.
 
-The production instance is mounted at `https://poeta.icu/verse/`. Reverse
-proxies should strip the `/verse/` prefix before forwarding and send
+Reverse proxies should strip the `/verse/` prefix before forwarding and send
 `X-Forwarded-Prefix: /verse`; the application uses that header when generating
 asset and navigation URLs.
 

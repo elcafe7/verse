@@ -3,14 +3,26 @@
 
 from __future__ import annotations
 
+import logging
+import os
 import re
 from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
+from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from core.db import EDITIONS, get_neighbor, get_source, get_verse, list_editions
 from verse import BIBLE_BOOKS, clean_text, normalize_book
+
+logger = logging.getLogger(__name__)
+
+INVALID_REFERENCE_MESSAGE = "Invalid reference. Use a reference such as John 3:16."
+
+
+def debug_enabled() -> bool:
+    """Debug mode is opt-in via VERSE_DEBUG=1; it is off by default."""
+    return os.environ.get("VERSE_DEBUG", "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 REFERENCE_RE = re.compile(r"(.+?)\s+(\d+)(?:[:.\s]+)(\d+)")
@@ -157,8 +169,9 @@ def create_app(test_config: dict | None = None) -> Flask:
 
         try:
             book, chapter, verse_number = parse_web_reference(raw_reference)
-        except ValueError as error:
-            return jsonify(error=str(error)), 400
+        except ValueError:
+            logger.info("Rejected verse reference", exc_info=True)
+            return jsonify(error=INVALID_REFERENCE_MESSAGE), 400
 
         database_reference = f"{edition}:{book}:{chapter}:{verse_number}"
         verse_text = get_verse(edition, database_reference)
@@ -201,6 +214,23 @@ def create_app(test_config: dict | None = None) -> Flask:
             return jsonify(error="API endpoint not found."), 404
         return render_template("index.html"), 404
 
+    @app.errorhandler(400)
+    def bad_request(error):
+        logger.info("Bad request on %s: %s", request.path, error.description)
+        if request.path.startswith("/api/"):
+            return jsonify(error="Bad request."), 400
+        return "Bad request.", 400
+
+    @app.errorhandler(Exception)
+    def internal_error(error):
+        # Let Flask/Werkzeug HTTP errors (404, 405, ...) keep their status.
+        if isinstance(error, HTTPException):
+            return error
+        logger.exception("Unhandled error on %s", request.path)
+        if request.path.startswith("/api/"):
+            return jsonify(error="Internal server error."), 500
+        return "Internal server error.", 500
+
     return app
 
 
@@ -208,4 +238,4 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5050, debug=True)
+    app.run(host="127.0.0.1", port=5050, debug=debug_enabled())

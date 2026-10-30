@@ -160,5 +160,55 @@ class WebAppTests(unittest.TestCase):
         self.assertIn("Verse not found", response.get_json()["error"])
 
 
+class ErrorHandlingTests(unittest.TestCase):
+    def test_invalid_reference_returns_generic_message(self):
+        client = create_app({"TESTING": True}).test_client()
+        response = client.get(
+            "/api/verse", query_string={"edition": "kjv", "reference": "not a verse"}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.get_json()["error"],
+            "Invalid reference. Use a reference such as John 3:16.",
+        )
+
+    def test_unhandled_error_is_generic_and_logged(self):
+        app = create_app({"TESTING": True})
+
+        @app.get("/api/boom-test")
+        def boom():
+            raise RuntimeError("secret internal detail")
+
+        client = app.test_client()
+        with self.assertLogs("web_app", level="ERROR") as logs:
+            response = client.get("/api/boom-test")
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.get_json()["error"], "Internal server error.")
+        self.assertNotIn(b"secret internal detail", response.data)
+        self.assertNotIn(b"Traceback", response.data)
+        self.assertTrue(any("secret internal detail" in line for line in logs.output))
+
+    def test_http_errors_keep_their_status(self):
+        client = create_app({"TESTING": True}).test_client()
+        self.assertEqual(client.post("/api/verse").status_code, 405)
+        self.assertEqual(client.get("/api/nope").status_code, 404)
+
+
+class DebugFlagTests(unittest.TestCase):
+    def test_debug_is_off_by_default(self):
+        from unittest import mock
+
+        import web_app
+
+        with mock.patch.dict("os.environ", {}, clear=True):
+            self.assertFalse(web_app.debug_enabled())
+        for value in ("0", "false", "", "no"):
+            with mock.patch.dict("os.environ", {"VERSE_DEBUG": value}):
+                self.assertFalse(web_app.debug_enabled())
+        for value in ("1", "true", "YES", "on"):
+            with mock.patch.dict("os.environ", {"VERSE_DEBUG": value}):
+                self.assertTrue(web_app.debug_enabled())
+
+
 if __name__ == "__main__":
     unittest.main()

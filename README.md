@@ -59,8 +59,8 @@ All data ships inside the repo (no download step):
 | `data/source/greek.db` | NT Greek source text, 7,941 verses |
 | `data/source/hebrew.db` | OT Hebrew source text, 23,145 verses |
 
-The source DBs are extracted from the OpenScriptures ESV interlinear with
-`scripts/build_source_db.py` (build-time only; runtime reads only verse data).
+The source DBs are built with `scripts/build_source_db.py` (build-time only;
+runtime reads only verse data).
 
 ## Install
 

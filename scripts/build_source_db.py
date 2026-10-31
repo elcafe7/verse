@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build verse's self-contained Greek (NT) and Hebrew (OT) source DBs.
 
-Extracts per-verse original-language text from the Lex ESV interlinear JSON
-(build-time source only; runtime verse never reads Lex data).
+Extracts per-verse original-language text from a local interlinear JSON file
+(build-time only; the runtime never reads it).
 """
 
 import json

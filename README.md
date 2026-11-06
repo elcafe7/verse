@@ -1,5 +1,7 @@
 # Verse
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A single-verse terminal Bible reader with original-language source text,
 backed entirely by local SQLite databases. Self-contained — no runtime
 dependency on Lex or any other project.
@@ -120,3 +122,7 @@ Gunicorn for TLS and public deployment.
 . .venv/bin/activate
 python -m unittest discover -s tests -v
 ```
+
+## License
+
+The code is under the [MIT License](LICENSE). The Bible texts are public domain.

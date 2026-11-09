@@ -18,6 +18,7 @@ release.
 Release files keep their existing names: `verse-offline-<YYYYMMDD>.tar.gz`
 and `.zip` (one top-level `dist/` folder) plus `SHA256SUMS`. Tags are
 `offline-YYYYMMDD` (or `offline-YYYYMMDD-N` for a second build that day).
+
 ## What runs
 
 - **Tag push (`offline-*`)**, in this order:

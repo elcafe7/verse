@@ -1,42 +1,104 @@
+<div align="center">
+
 # Verse
+
+**Read the Bible one verse at a time.**
+One verse on the screen, nothing else in the way, with the Hebrew or Greek beneath it if you want.
+
+<!-- Maintainers: the offline file name carries its date. After a new offline-* release, update verse-offline-20261023 everywhere in this file. -->
+### [⬇ Download for offline use](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261023.zip)
+
+<sub>verse-offline-20261023.zip · about 8 MB · free · <a href="https://github.com/elcafe7/verse/releases/latest">release page</a></sub>
+
+[**Read online**](https://apocalypse.press/verse/) · [Word](https://apocalypse.press/word/) · [Scroll](https://apocalypse.press/scroll/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A single-verse terminal Bible reader with original-language source text,
-backed entirely by local SQLite databases. Self-contained — no runtime
-dependency on Lex or any other project.
+<sub>A project of <a href="https://jesuspeoplesf.com">Jesus People SF</a> &amp; <a href="https://apocalypse.press">Apocalypse Press</a> · <a href="https://jesuspeoplesf.com/donate/">Donate</a></sub>
 
-Verse now includes two interfaces over the same bundled corpus:
+<img src="readme-assets/verse-phone.png" alt="Verse on a phone showing John 3:16 in the Geneva Bible, with Previous and Next buttons below" width="300">
 
-- a responsive browser reader with shareable URLs, swipe and keyboard
-  navigation, theme and edition controls, and Hebrew/Greek source panels;
-- the original focused terminal reader.
+</div>
+
+---
+
+## What it is
+
+Verse shows one Bible verse at a time, large and quiet, so you can slow down and take it in. Type a reference like **John 3:16** or **Ps 23:1**, or step forward and back one verse at a time.
+
+- **Three Bibles:** Geneva Bible (1599), King James Version (1611 original), and King James Version (Oxford 1769). The Geneva and 1611 editions include the Apocrypha.
+- **The original languages:** show the Hebrew (Old Testament) or Greek (New Testament) under the English, with a pronunciation guide.
+- **Minimalist mode:** hide everything except the verse.
+- **Light or dark**, and it remembers your choices.
+
+## Read online
+
+Open **[apocalypse.press/verse](https://apocalypse.press/verse/)** in any browser, on a computer or a phone. Nothing to install.
+
+## Download for offline use
+
+Want to read with no internet, or with fewer distractions? Download Verse once and keep it.
+
+1. **Download** [verse-offline-20261023.zip](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261023.zip) (about 8 MB).
+2. **Unzip it.** You get one folder called `dist`.
+3. **Open `index.html`** inside that folder by double-clicking it. It opens in Chrome, Edge, Safari, or Firefox.
+4. **That's it.** It works with no internet connection. Keep `index.html` in the folder with its `data` folder and other files.
+
+Your place and settings are saved in your browser on your own device. No account, no sign-up.
+
+**On a phone?** The easiest way is to read online at [apocalypse.press/verse](https://apocalypse.press/verse/). You can add it to your home screen from your browser's Share or menu button, like any web page.
+
+<sub>Prefer a .tar.gz? [verse-offline-20261023.tar.gz](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261023.tar.gz). Every file and its checksum is on the [release page](https://github.com/elcafe7/verse/releases/latest).</sub>
+
+## How to use it
+
+1. Type a verse in the box (for example **John 3:16** or **Ps 23:1**) and press **Read**.
+2. Choose a Bible from the menu at the top.
+3. Use **Previous** and **Next**, the arrow keys, or swipe, to move one verse at a time.
+
+| Action | Keyboard | Touch |
+|---|---|---|
+| Previous / next verse | <kbd>←</kbd> / <kbd>→</kbd> | Swipe, or tap **Previous** / **Next** |
+| Show or hide the Hebrew / Greek | <kbd>S</kbd> | **Source text** button |
+| Minimalist mode | <kbd>M</kbd> | **Minimalist mode** button |
+| Light / dark | <kbd>T</kbd> | **Sun** button |
+| Find a verse | <kbd>/</kbd> | Tap the verse box |
+
+## Texts
+
+Bible text: Geneva Bible (1599), King James Version (1611 original, with Apocrypha), King James Version (Oxford 1769). Hebrew and Greek source text with transliteration. All public domain.
+
+## More from us
+
+- [Word](https://apocalypse.press/word/): Scripture one word at a time
+- [Scroll](https://apocalypse.press/scroll/): the Bible rolling gently up your screen
+- [Apocalypse Press](https://apocalypse.press) · [Jesus People SF](https://jesuspeoplesf.com) · [Donate](https://jesuspeoplesf.com/donate/)
+
+## License
+
+The code is under the [MIT License](LICENSE). The Bible texts are public domain.
+
+---
+
+## For developers
+
+You only need this to run or change the code. To read, use the download above.
+
+This repo also has a terminal Bible reader and a small Flask web app over the same bundled texts, backed by local SQLite databases. No runtime dependency on Lex or any other project.
 
 ```sh
 verse -v kjv "John 3:16"
 verse -v gen "Psalm 23:1"
 ```
 
-## Offline HTML build
-
-Going off-grid? Grab the offline HTML build (KJV + KJ1611 with Apocrypha +
-Geneva 1599 with Apocrypha + Hebrew/Greek sources, no dependencies, no
-internet needed):
-
-**[Download verse-offline-20261023.tar.gz](https://github.com/elcafe7/verse/releases/download/offline-20261023/verse-offline-20261023.tar.gz)**
-(no tar handy? grab the
-[.zip instead](https://github.com/elcafe7/verse/releases/download/offline-20261023/verse-offline-20261023.zip))
+The offline download is built from the private `verse_web` repo (`offline/build_offline.py`, standard library only). To open it from a terminal:
 
 ```sh
 tar -xzf verse-offline-20261023.tar.gz
 xdg-open dist/index.html   # works over file://, USB stick, airplane mode
 ```
 
-Built from the private `verse_web` repo (`offline/build_offline.py`, stdlib
-only) and attached to the
-[offline-20261023 release](https://github.com/elcafe7/verse/releases/tag/offline-20261023).
-
-## Features
+### Terminal reader features
 
 - **Three English editions** bundled: KJV, KJ1611 (`kj16`) and Geneva 1599
   (`gen`) — exact verse lookup with tolerant book aliases
@@ -51,7 +113,7 @@ only) and attached to the
   `[[ ]]` tituli, RTF tokens) for clean reading; KJV psalm superscriptions
   keep their printed brackets.
 
-## Data
+### Data
 
 All data ships inside the repo (no download step):
 
@@ -64,7 +126,7 @@ All data ships inside the repo (no download step):
 The source DBs are built with `scripts/build_source_db.py` (build-time only;
 runtime reads only verse data).
 
-## Install
+### Install
 
 Requires Python 3. Install the shared CLI and web dependencies:
 
@@ -75,7 +137,7 @@ pip install -r requirements.txt
 ln -s "$PWD/verse.py" ~/.local/bin/verse   # or your own launcher
 ```
 
-## Usage
+### Usage
 
 ```sh
 verse -v kjv "John 3:16"    # one-shot read
@@ -86,7 +148,7 @@ verse -v kj16 "Romans 8:28" -dark
 Interactive keys: `←` `→` navigate · `t` theme · `v` version · `s` source ·
 `q` quit
 
-## Web app
+### Web app
 
 Start the development server:
 
@@ -116,13 +178,9 @@ gunicorn --workers 2 --bind 127.0.0.1:5050 web_app:app
 The SQLite files are read-only at runtime. Place a reverse proxy in front of
 Gunicorn for TLS and public deployment.
 
-## Tests
+### Tests
 
 ```sh
 . .venv/bin/activate
 python -m unittest discover -s tests -v
 ```
-
-## License
-
-The code is under the [MIT License](LICENSE). The Bible texts are public domain.

@@ -4,3 +4,7 @@ __pycache__/
 .venv/
 *.db-shm
 *.db-wal
+offline/dist/
+dist/
+notes/
+scan-report/

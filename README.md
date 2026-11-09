@@ -1,6 +1,7 @@
 # Verse
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/elcafe7/verse/badge)](https://scorecard.dev/viewer/?uri=github.com/elcafe7/verse)
 
 A single-verse terminal Bible reader with original-language source text,
 backed entirely by local SQLite databases. Self-contained — no runtime
@@ -32,9 +33,57 @@ tar -xzf verse-offline-20261023.tar.gz
 xdg-open dist/index.html   # works over file://, USB stick, airplane mode
 ```
 
-Built from the private `verse_web` repo (`offline/build_offline.py`, stdlib
-only) and attached to the
+Built with `offline/build_offline.py` (stdlib only) and attached to the
 [offline-20261023 release](https://github.com/elcafe7/verse/releases/tag/offline-20261023).
+To rebuild locally: `python3 offline/build_offline.py`, then
+`tar -czf verse-offline.tar.gz -C offline dist`. New releases are built by
+[`.github/workflows/release.yml`](.github/workflows/release.yml) when an
+`offline-YYYYMMDD` tag is pushed.
+
+## Verification
+
+Releases built by [`.github/workflows/release.yml`](.github/workflows/release.yml)
+are built, scanned, checksummed and attested by GitHub Actions. Each such
+release on the [Releases page](https://github.com/elcafe7/verse/releases) has, next
+to the downloads:
+
+| File | What it is |
+|---|---|
+| `SHA256SUMS` | SHA-256 checksums for every file in the release |
+| `<name>.cdx.json` | CycloneDX SBOM (software bill of materials) |
+| `<name>-osv-scan.json` / `.md` | Dated OSV-Scanner report |
+| `verification.json` | Scan summary (tool, date, result, report link) for download pages |
+
+A release is only published when every check passes: OSV-Scanner finds no
+known vulnerabilities (CVSS 7.0 or higher fails the release, and lower-rated
+findings hold it too; advisories with no CVSS score are listed as warnings),
+the checksums verify, and VirusTotal (when turned on) flags nothing. If any
+check fails, nothing is published, and the findings with a suggested fix go
+to a "Release blocked" issue instead. Details:
+[docs/RELEASE_VERIFICATION.md](docs/RELEASE_VERIFICATION.md).
+
+**Check the checksums** (download the files plus `SHA256SUMS` into one folder):
+
+```bash
+sha256sum -c --ignore-missing SHA256SUMS        # Linux
+shasum -a 256 -c --ignore-missing SHA256SUMS    # macOS
+```
+
+**Check build provenance** with the [GitHub CLI](https://cli.github.com/).
+This confirms the file was built from this repository by GitHub Actions:
+
+```bash
+gh attestation verify verse-offline-<YYYYMMDD>.tar.gz -R elcafe7/verse
+```
+
+**Re-scan against today's advisories** (the report is a dated record):
+
+```bash
+osv-scanner scan source -L verse-offline-<YYYYMMDD>.cdx.json
+```
+
+Releases published before the workflow existed have only `SHA256SUMS`.
+
 
 ## Features
 

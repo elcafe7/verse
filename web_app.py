@@ -13,7 +13,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from core.db import EDITIONS, get_neighbor, get_source, get_verse, list_editions
-from verse import BIBLE_BOOKS, clean_text, normalize_book
+from verse import BIBLE_BOOKS, clean_text, normalize_book, split_reference
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +25,13 @@ def debug_enabled() -> bool:
     return os.environ.get("VERSE_DEBUG", "").strip().lower() in {"1", "true", "yes", "on"}
 
 
-REFERENCE_RE = re.compile(r"(.+?)\s+(\d+)(?:[:.\s]+)(\d+)")
-
-
 def parse_web_reference(raw_reference: str) -> tuple[str, int, int]:
     """Return a canonical book, chapter, and verse from human input."""
-    match = REFERENCE_RE.fullmatch(raw_reference.strip())
-    if not match:
+    parts = split_reference(raw_reference.strip())
+    if parts is None:
         raise ValueError("Use a reference such as John 3:16.")
 
-    raw_book, raw_chapter, raw_verse = match.groups()
+    raw_book, raw_chapter, raw_verse = parts
     book = normalize_book(raw_book.strip())
     chapter = int(raw_chapter)
     verse = int(raw_verse)

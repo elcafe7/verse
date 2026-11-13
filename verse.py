@@ -337,6 +337,53 @@ def choose_edition() -> str:
     sys.exit(1)
 
 
+def split_reference(raw_reference: str) -> tuple[str, str, str] | None:
+    """Split 'Book Chapter:Verse' into its three raw parts, or return None.
+
+    Accepts exactly what re.fullmatch(r"(.+?)\\s+(\\d+)(?:[:.\\s]+)(\\d+)") used to
+    accept, with the same groups, but scans once from the right instead of
+    backtracking, so long input can't make it slow (CodeQL
+    py/polynomial-redos). The book is everything before the whitespace that
+    precedes the chapter; the separator between chapter and verse is any run
+    of ':', '.' or whitespace.
+    """
+    text = raw_reference
+    end = len(text)
+
+    verse_start = end
+    while verse_start > 0 and text[verse_start - 1].isdecimal():
+        verse_start -= 1
+    if verse_start == end:
+        return None
+
+    separator_start = verse_start
+    while separator_start > 0 and (
+        text[separator_start - 1] in ":." or text[separator_start - 1].isspace()
+    ):
+        separator_start -= 1
+    if separator_start == verse_start:
+        return None
+
+    chapter_start = separator_start
+    while chapter_start > 0 and text[chapter_start - 1].isdecimal():
+        chapter_start -= 1
+    if chapter_start == separator_start:
+        return None
+
+    book_end = chapter_start
+    while book_end > 0 and text[book_end - 1].isspace():
+        book_end -= 1
+    # The book needs at least one character and at least one whitespace
+    # character must remain between it and the chapter.
+    book_end = max(book_end, 1)
+    if book_end >= chapter_start:
+        return None
+    book = text[:book_end]
+    if "\n" in book:
+        return None
+    return book, text[chapter_start:separator_start], text[verse_start:end]
+
+
 def parse_reference(raw_reference: str, requested_edition: str | None) -> tuple[str, str]:
     """Normalize reference to edition:Book:Chapter:Verse."""
     raw_reference = raw_reference.strip()
@@ -347,10 +394,10 @@ def parse_reference(raw_reference: str, requested_edition: str | None) -> tuple[
             f"unknown edition '{requested_edition}' (choose from: {', '.join(EDITIONS)})"
         )
 
-    match = re.fullmatch(r"(.+?)\s+(\d+)(?:[:.\s]+)(\d+)", raw_reference)
-    if not match:
+    parts = split_reference(raw_reference)
+    if parts is None:
         raise ValueError("reference must look like 'John 3:16', 'gen 1.1', or 'gen 1 1'")
-    book, chapter, verse = match.groups()
+    book, chapter, verse = parts
     book = normalize_book(book.strip())
     return requested_edition, f"{requested_edition}:{book}:{chapter}:{verse}"
 

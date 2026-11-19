@@ -13,6 +13,11 @@ def _connect_readonly(db_path: Path) -> sqlite3.Connection:
     return sqlite3.connect(f"{db_path.as_uri()}?mode=ro&immutable=1", uri=True)
 
 
+# Edition id -> bundled database file, filled by _load_editions(). Lookups go
+# through this table so a database path is never built from request input.
+_EDITION_DB_PATHS: dict[str, Path] = {}
+
+
 def _load_editions() -> dict[str, str]:
     editions = {}
     for db_path in sorted(DATA_DIR.glob("*.db")):
@@ -25,6 +30,7 @@ def _load_editions() -> dict[str, str]:
         except sqlite3.Error:
             continue
         editions[edition] = row[0] if row else edition.upper()
+        _EDITION_DB_PATHS[edition] = db_path
     return editions
 
 
@@ -105,8 +111,8 @@ def _reference_candidates(reference: str) -> list[str]:
 
 def get_verse(edition: str, reference: str) -> str | None:
     """Return an exact verse, tolerating case and spacing differences."""
-    db_path = DATA_DIR / f"{edition}.db"
-    if edition not in EDITIONS or not db_path.is_file():
+    db_path = _EDITION_DB_PATHS.get(edition)
+    if db_path is None or not db_path.is_file():
         return None
 
     row = None
@@ -173,8 +179,8 @@ def get_neighbor(
     edition: str, reference: str, direction: int
 ) -> tuple[str, str] | None:
     """Return the previous or next verse in database order."""
-    db_path = DATA_DIR / f"{edition}.db"
-    if edition not in EDITIONS or direction not in (-1, 1):
+    db_path = _EDITION_DB_PATHS.get(edition)
+    if db_path is None or direction not in (-1, 1):
         return None
 
     with _connect_readonly(db_path) as connection:

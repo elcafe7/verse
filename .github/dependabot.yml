@@ -1,6 +1,7 @@
 # Keeps the SHA-pinned actions in .github/workflows current (Dependabot
 # updates the commit SHA and the "# vX.Y.Z" comment together) and the
-# pip dependencies. Weekly, grouped into one PR per ecosystem.
+# pip dependencies, plus the hash-pinned CI tooling in .github/requirements
+# (Ruff). Weekly, grouped into one PR per ecosystem.
 version: 2
 updates:
   - package-ecosystem: "github-actions"
@@ -23,3 +24,13 @@ updates:
           - "*"
     commit-message:
       prefix: "deps"
+  - package-ecosystem: "pip"
+    directory: "/.github/requirements"
+    schedule:
+      interval: "weekly"
+    groups:
+      ci-tools:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "ci"

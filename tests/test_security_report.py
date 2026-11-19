@@ -157,7 +157,7 @@ class VirusTotalWordingTests(unittest.TestCase):
         return d, (d / "summary.md").read_text()
 
     def _vt_row(self, summary: str) -> str:
-        rows = [l for l in summary.splitlines() if l.startswith("| VirusTotal |")]
+        rows = [line for line in summary.splitlines() if line.startswith("| VirusTotal |")]
         self.assertEqual(len(rows), 1, summary)
         return rows[0]
 
@@ -193,7 +193,7 @@ class VirusTotalWordingTests(unittest.TestCase):
             self._assert_not_scanned(d, row)
 
     def test_missing_key_note(self):
-        note = Path(t := tempfile.mkdtemp()) / "note.md"
+        note = Path(tempfile.mkdtemp()) / "note.md"
         p = run(ROOT / "scripts" / "virustotal_not_run.sh", str(note), "missing-key")
         self.assertEqual(p.returncode, 0, p.stderr)
         text = note.read_text()

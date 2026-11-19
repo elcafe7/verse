@@ -23,3 +23,14 @@ updates:
           - "*"
     commit-message:
       prefix: "deps"
+  # Hash-pinned CI tooling (Atheris for .github/workflows/fuzz.yml).
+  - package-ecosystem: "pip"
+    directory: "/.github/requirements"
+    schedule:
+      interval: "weekly"
+    groups:
+      ci-tools:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "ci"

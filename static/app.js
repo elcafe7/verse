@@ -40,6 +40,56 @@ const elements = {
   themeMeta: document.querySelector('meta[name="theme-color"]'),
 };
 
+/* __WAKELOCK_START__ */
+/* Screen Wake Lock while a verse is on screen — no-op when unsupported or denied. */
+var wakeLockSentinel = null;
+var wantWakeLock = false;
+var wakeLockInited = false;
+
+function wakeLockApi() {
+  return (typeof navigator !== "undefined" && navigator.wakeLock) || null;
+}
+
+function acquireWakeLock() {
+  var wl = wakeLockApi();
+  if (!wl || !wantWakeLock || document.hidden) return Promise.resolve();
+  if (wakeLockSentinel && !wakeLockSentinel.released) return Promise.resolve();
+  return wl.request("screen").then(function (sentinel) {
+    if (!wantWakeLock) { return Promise.resolve(sentinel.release()).catch(function () {}); }
+    wakeLockSentinel = sentinel;
+    sentinel.addEventListener("release", function () { if (wakeLockSentinel === sentinel) wakeLockSentinel = null; });
+  }).catch(function () {
+    wakeLockSentinel = null;
+  });
+}
+
+function requestWakeLock() {
+  wantWakeLock = true;
+  return acquireWakeLock();
+}
+
+function releaseWakeLock() {
+  wantWakeLock = false;
+  var s = wakeLockSentinel;
+  wakeLockSentinel = null;
+  if (!s || s.released) return Promise.resolve();
+  try {
+    return Promise.resolve(s.release()).catch(function () {});
+  } catch (_e) {
+    return Promise.resolve();
+  }
+}
+
+function initWakeLock() {
+  if (wakeLockInited) return;
+  wakeLockInited = true;
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) return;
+    if (wantWakeLock) acquireWakeLock();
+  });
+}
+/* __WAKELOCK_END__ */
+
 let suggestionRequest = 0;
 let suggestionTimer = null;
 let activeSuggestion = -1;
@@ -219,6 +269,7 @@ function setLoading(loading) {
 }
 
 function showError(message) {
+  void releaseWakeLock();
   elements.errorMessage.textContent = message;
   elements.errorCard.hidden = false;
   document.querySelector(".verse-card").hidden = true;
@@ -270,6 +321,7 @@ function render(data) {
 
   elements.sourceButton.setAttribute("aria-pressed", String(state.sourceVisible));
   document.title = `${reference.display} (${state.edition.toUpperCase()}) — Verse`;
+  void requestWakeLock();
 }
 
 async function loadVerse({ historyMode = "replace", restoreEdition = null } = {}) {
@@ -411,6 +463,7 @@ window.addEventListener("popstate", () => {
 });
 
 async function init() {
+  initWakeLock();
   Object.assign(state, urlState());
   setTheme(preferredTheme());
   setMinimalMode(state.minimalMode);

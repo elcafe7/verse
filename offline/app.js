@@ -21,8 +21,9 @@
     if (!wl || !wantWakeLock || document.hidden) return Promise.resolve();
     if (wakeLockSentinel && !wakeLockSentinel.released) return Promise.resolve();
     return wl.request("screen").then(function (sentinel) {
+      if (!wantWakeLock) { return Promise.resolve(sentinel.release()).catch(function () {}); }
       wakeLockSentinel = sentinel;
-      wakeLockSentinel.addEventListener("release", function () { wakeLockSentinel = null; });
+      sentinel.addEventListener("release", function () { if (wakeLockSentinel === sentinel) wakeLockSentinel = null; });
     }).catch(function () {
       wakeLockSentinel = null;
     });

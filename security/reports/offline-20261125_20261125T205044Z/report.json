@@ -1,0 +1,11 @@
+{
+  "tag": "offline-20261125",
+  "timestamp": "20261125T205044Z",
+  "date_utc": "2026-11-25T20:50:44Z",
+  "status": "published",
+  "result": "pass",
+  "folder": "reports/offline-20261125_20261125T205044Z",
+  "summary": "reports/offline-20261125_20261125T205044Z/summary.md",
+  "release_url": "https://github.com/elcafe7/verse/releases/tag/offline-20261125",
+  "run_url": "https://github.com/elcafe7/verse/actions/runs/45698601479"
+}

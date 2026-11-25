@@ -198,12 +198,20 @@ def get_neighbor(
         if current is None:
             return None
 
-        operator, ordering = (">", "ASC") if direction > 0 else ("<", "DESC")
-        row = connection.execute(
-            f"""SELECT reference, text FROM bible
-                WHERE id {operator} ? AND reference NOT LIKE '%:0'
-                ORDER BY id {ordering}
-                LIMIT 1""",
-            (current[0],),
-        ).fetchone()
+        if direction > 0:
+            row = connection.execute(
+                """SELECT reference, text FROM bible
+                   WHERE id > ? AND reference NOT LIKE '%:0'
+                   ORDER BY id ASC
+                   LIMIT 1""",
+                (current[0],),
+            ).fetchone()
+        else:
+            row = connection.execute(
+                """SELECT reference, text FROM bible
+                   WHERE id < ? AND reference NOT LIKE '%:0'
+                   ORDER BY id DESC
+                   LIMIT 1""",
+                (current[0],),
+            ).fetchone()
     return (row[0], row[1]) if row else None

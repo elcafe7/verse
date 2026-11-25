@@ -5,10 +5,10 @@
 **Read the Bible one verse at a time.**
 One verse on the screen, nothing else in the way, with the Hebrew or Greek beneath it if you want.
 
-<!-- Maintainers: the offline file name carries its date. After a new offline-* release, update verse-offline-20261023 everywhere in this file. -->
-### [⬇ Download for offline use](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261023.zip)
+<!-- Maintainers: the offline file name carries its date. After a new offline-* release, update the dated filename everywhere in this file. -->
+### [⬇ Download for offline use](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261125.zip)
 
-<sub>verse-offline-20261023.zip · about 8 MB · free · <a href="https://github.com/elcafe7/verse/releases/latest">release page</a></sub>
+<sub>verse-offline-20261125.zip · about 8 MB · free · <a href="https://github.com/elcafe7/verse/releases/latest">release page</a></sub>
 
 [**Read online**](https://apocalypse.press/verse/) · [Word](https://apocalypse.press/word/) · [Scroll](https://apocalypse.press/scroll/)
 
@@ -46,7 +46,7 @@ Open **[apocalypse.press/verse](https://apocalypse.press/verse/)** in any browse
 
 Want to read with no internet, or with fewer distractions? Download Verse once and keep it.
 
-1. **Download** [verse-offline-20261023.zip](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261023.zip) (about 8 MB).
+1. **Download** [verse-offline-20261125.zip](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261125.zip) (about 8 MB).
 2. **Unzip it.** You get one folder called `dist`.
 3. **Open `index.html`** inside that folder by double-clicking it. It opens in Chrome, Edge, Safari, or Firefox.
 4. **That's it.** It works with no internet connection. Keep `index.html` in the folder with its `data` folder and other files.
@@ -55,7 +55,7 @@ Your place and settings are saved in your browser on your own device. No account
 
 **On a phone?** The easiest way is to read online at [apocalypse.press/verse](https://apocalypse.press/verse/). You can add it to your home screen from your browser's Share or menu button, like any web page.
 
-<sub>Prefer a .tar.gz? [verse-offline-20261023.tar.gz](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261023.tar.gz). Every file and its checksum is on the [release page](https://github.com/elcafe7/verse/releases/latest).</sub>
+<sub>Prefer a .tar.gz? [verse-offline-20261125.tar.gz](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261125.tar.gz). Every file and its checksum is on the [release page](https://github.com/elcafe7/verse/releases/latest).</sub>
 
 ## How to use it
 
@@ -107,7 +107,7 @@ verse -v gen "Psalm 23:1"
 The offline download is built from the private `verse_web` repo (`offline/build_offline.py`, standard library only). To open it from a terminal:
 
 ```sh
-tar -xzf verse-offline-20261023.tar.gz
+tar -xzf verse-offline-20261125.tar.gz
 xdg-open dist/index.html   # works over file://, USB stick, airplane mode
 ```
 

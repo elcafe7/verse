@@ -24,7 +24,8 @@ class SplitReferenceTests(unittest.TestCase):
 
     def test_matches_old_pattern(self):
         alphabet = list("ab1 2:.\n\t\u0663\u00a0J")
-        rnd = random.Random(20261112)
+        # This seeded generator creates reproducible parser test data; it is not used for security decisions.
+        rnd = random.Random(20261112)  # nosec B311
         for _ in range(20000):
             text = "".join(rnd.choice(alphabet) for _ in range(rnd.randint(0, 9)))
             match = OLD_REFERENCE_RE.fullmatch(text)

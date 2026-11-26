@@ -30,6 +30,12 @@ from web_app import parse_web_reference, split_database_reference  # noqa: E402
 MAX_CHARS = 512
 
 
+def require(condition, detail=None):
+    """Raise on a broken fuzz invariant, including under optimized Python."""
+    if not condition:
+        raise AssertionError(detail)
+
+
 def check_text(text):
     """Run every helper on one string and assert its invariants."""
     try:
@@ -37,21 +43,21 @@ def check_text(text):
     except ValueError:
         pass
     else:
-        assert isinstance(book, str) and book, text
-        assert chapter >= 1 and verse >= 1, text
+        require(isinstance(book, str) and book, text)
+        require(chapter >= 1 and verse >= 1, text)
 
     try:
         edition, book, chapter, verse = split_database_reference(text)
     except ValueError:
         pass
     else:
-        assert isinstance(edition, str) and isinstance(book, str), text
+        require(isinstance(edition, str) and isinstance(book, str), text)
 
-    assert isinstance(normalize_book(text), str)
-    assert isinstance(clean_text(text), str)
+    require(isinstance(normalize_book(text), str))
+    require(isinstance(clean_text(text), str))
     candidates = _reference_candidates(text)
-    assert candidates and text in candidates, (text, candidates)
-    assert len(set(candidates)) == len(candidates), candidates
+    require(candidates and text in candidates, (text, candidates))
+    require(len(set(candidates)) == len(candidates), candidates)
 
 
 def test_one_input(data):

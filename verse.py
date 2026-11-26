@@ -4,7 +4,8 @@
 import argparse
 import os
 import re
-import subprocess
+# The macOS probe reads one fixed preference key and has no user-controlled arguments.
+import subprocess  # nosec B404
 import sys
 import termios
 import tty
@@ -176,8 +177,9 @@ def detect_terminal_theme() -> str:
 
     if sys.platform == "darwin":
         try:
-            result = subprocess.run(
-                ["defaults", "read", "-g", "AppleInterfaceStyle"],
+            # This fixed, read-only platform probe has no user input and a bounded timeout.
+            result = subprocess.run(  # nosec B603
+                ["/usr/bin/defaults", "read", "-g", "AppleInterfaceStyle"],
                 capture_output=True,
                 text=True,
                 timeout=0.5,

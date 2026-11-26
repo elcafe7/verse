@@ -10,6 +10,7 @@ its report stays a workflow artifact and the "Release blocked" issue has the fin
 
 | Date (UTC) | Release | Result | Report |
 |---|---|---|---|
+| 2026-11-26 00:18:36 UTC | `offline-20261125-1` | pass | [summary](reports/offline-20261125-1_20261126T001836Z/summary.md) |
 | 2026-11-25 20:50:44 UTC | `offline-20261125` | pass | [summary](reports/offline-20261125_20261125T205044Z/summary.md) |
 
 Setup the maintainer does by hand (OpenSSF Best Practices, Socket.dev):

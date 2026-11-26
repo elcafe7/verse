@@ -253,5 +253,5 @@ OpenSSF Scorecard JSON. Index of all runs, newest first:
 [security/latest.json](security/latest.json)).
 
 <!-- security-reports:start -->
-Latest: `offline-20261125` on 2026-11-25 20:50:44 UTC, result **pass** ([summary](security/reports/offline-20261125_20261125T205044Z/summary.md)). All runs: [security/README.md](security/README.md).
+Latest: `offline-20261125-1` on 2026-11-26 00:18:36 UTC, result **pass** ([summary](security/reports/offline-20261125-1_20261126T001836Z/summary.md)). All runs: [security/README.md](security/README.md).
 <!-- security-reports:end -->

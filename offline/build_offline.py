@@ -29,6 +29,34 @@ from core.refs import clean_text  # noqa: E402
 
 OFFLINE_DIR = os.path.join(ROOT, "offline")
 DIST_DIR = os.path.join(OFFLINE_DIR, "dist")
+VERSION_FILE = os.path.join(ROOT, "VERSION")
+VERSION_TOKEN = "__VERSE_VERSION__"
+TAG_RE = re.compile(r"^offline-[0-9]{8}(-[0-9]+)?$")
+
+
+def read_version(env=None, version_file=VERSION_FILE):
+    """Release tag for the offline build: VERSE_OFFLINE_TAG, else VERSION."""
+    env = os.environ if env is None else env
+    raw = str(env.get("VERSE_OFFLINE_TAG") or "").strip()
+    if not raw:
+        with open(version_file, encoding="utf-8") as f:
+            raw = f.read().strip()
+    if not TAG_RE.fullmatch(raw):
+        raise SystemExit(f"version must look like offline-YYYYMMDD or offline-YYYYMMDD-N (got {raw!r})")
+    return raw
+
+
+def stamp_shell(html, version):
+    """Replace every __VERSE_VERSION__ token. Refuses to ship a placeholder."""
+    if VERSION_TOKEN not in html:
+        raise SystemExit("shell.html is missing the __VERSE_VERSION__ placeholder")
+    out = html.replace(VERSION_TOKEN, version)
+    if VERSION_TOKEN in out:
+        raise SystemExit("version placeholder left in stamped shell")
+    if version not in out:
+        raise SystemExit("stamped shell is missing the version")
+    return out
+
 
 EDITIONS = {
     "kjv": "King James Version (Oxford 1769)",
@@ -157,8 +185,12 @@ def main() -> None:
         f.write(json.dumps(index, ensure_ascii=False, separators=(",", ":")))
         f.write(";\n")
 
-    # Shell assets.
-    shutil.copy(os.path.join(OFFLINE_DIR, "shell.html"), os.path.join(DIST_DIR, "index.html"))
+    # Shell assets, with the release tag stamped into the visible UI.
+    version = read_version()
+    with open(os.path.join(OFFLINE_DIR, "shell.html"), encoding="utf-8") as f:
+        stamped = stamp_shell(f.read(), version)
+    with open(os.path.join(DIST_DIR, "index.html"), "w", encoding="utf-8") as f:
+        f.write(stamped)
     shutil.copy(os.path.join(OFFLINE_DIR, "app.js"), os.path.join(DIST_DIR, "app.js"))
     shutil.copy(os.path.join(ROOT, "static", "styles.css"), os.path.join(DIST_DIR, "styles.css"))
     shutil.copy(os.path.join(ROOT, "static", "favicon.svg"), os.path.join(DIST_DIR, "favicon.svg"))
@@ -168,7 +200,7 @@ def main() -> None:
         for dp, _, fns in os.walk(DIST_DIR) for f in fns
     )
     nfiles = sum(len(fns) for _, _, fns in os.walk(DIST_DIR))
-    print(f"dist/: {nfiles} files, {total / 1e6:.1f} MB")
+    print(f"dist/: {nfiles} files, {total / 1e6:.1f} MB, version {version}")
 
 
 if __name__ == "__main__":

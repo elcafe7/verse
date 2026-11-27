@@ -1,0 +1,46 @@
+# Unit tests on every pull request and every push to main (OpenSSF Best
+# Practices test_continuous_integration). A failing test fails the job.
+#
+# Matches the documented suite: python3 -m unittest discover -s tests, with
+# dependencies from requirements.txt in a clean venv. Ruff already runs in
+# lint.yml; this job is the product test suite itself.
+# Free tools only. Every action is pinned to a full commit SHA.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Python unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies and run unit tests
+        run: |
+          python3 -m venv "$RUNNER_TEMP/test-venv"
+          "$RUNNER_TEMP/test-venv/bin/python" -m pip install --quiet --upgrade pip
+          "$RUNNER_TEMP/test-venv/bin/python" -m pip install --quiet -r requirements.txt
+          "$RUNNER_TEMP/test-venv/bin/python" -m unittest discover -s tests -v

@@ -52,11 +52,12 @@ python verse.py -v kjv "John 3:16"          # quick smoke test
 
 Every pull request runs these GitHub Actions checks, and they must pass before merging:
 
+- **Tests**: [`.github/workflows/tests.yml`](.github/workflows/tests.yml) (`python3 -m unittest discover -s tests`)
 - **Lint (Ruff)**: [`.github/workflows/lint.yml`](.github/workflows/lint.yml)
 - **CodeQL** (GitHub code scanning)
 
-The full unit test suite runs locally (above) and again in the release
-workflow, which won't publish a release unless it passes.
+The release workflow ([`.github/workflows/release.yml`](.github/workflows/release.yml))
+runs the same unit tests again and won't publish a release unless they pass.
 
 ## Requirements for contributions
 

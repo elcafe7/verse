@@ -2,13 +2,15 @@
 
 # Verse
 
+**Current offline release: [offline-20261125-1](https://github.com/elcafe7/verse/releases/tag/offline-20261125-1)** · 25 November 2026
+
 **Read the Bible one verse at a time.**
 One verse on the screen, nothing else in the way, with the Hebrew or Greek beneath it if you want.
 
-<!-- Maintainers: the offline file name carries its date. After a new offline-* release, update the dated filename everywhere in this file. -->
+<!-- Maintainers: after a new offline-* release, update VERSION, the Current offline release line, and the dated verse-offline-YYYYMMDD filename everywhere in this file. The zip/tar name uses the date only (no -N suffix); the tag may be offline-YYYYMMDD-N. -->
 ### [⬇ Download for offline use](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261125.zip)
 
-<sub>verse-offline-20261125.zip · about 8 MB · free · <a href="https://github.com/elcafe7/verse/releases/latest">release page</a></sub>
+<sub>offline-20261125-1 · verse-offline-20261125.zip · about 8 MB · free · <a href="https://github.com/elcafe7/verse/releases/latest">release page</a></sub>
 
 [**Read online**](https://apocalypse.press/verse/) · [Word](https://apocalypse.press/word/) · [Scroll](https://apocalypse.press/scroll/)
 

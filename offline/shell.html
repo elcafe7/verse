@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#15130f">
     <meta name="description" content="A focused offline Bible reader with original-language source text. No internet needed.">
-    <title>Verse Offline — A focused Bible reader</title>
+    <title>Verse Offline __VERSE_VERSION__ — A focused Bible reader</title>
+    <meta name="verse-version" content="__VERSE_VERSION__">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
     <script src="data/index.js"></script>
@@ -14,10 +15,13 @@
   <body>
     <div class="grain" aria-hidden="true"></div>
     <header class="site-header">
-      <a class="wordmark" href="#/" aria-label="Verse home">
-        <span class="wordmark-mark" aria-hidden="true">V</span>
-        <span>Verse</span>
-      </a>
+      <div class="brand">
+        <a class="wordmark" href="#/" aria-label="Verse home">
+          <span class="wordmark-mark" aria-hidden="true">V</span>
+          <span>Verse</span>
+        </a>
+        <span class="app-version" data-testid="app-version">__VERSE_VERSION__</span>
+      </div>
       <div class="header-actions">
         <label class="select-wrap" aria-label="Bible edition">
           <select id="edition-select"></select>
@@ -113,7 +117,7 @@
     <footer>
       <p>Three editions. Hebrew and Greek source text. Fully offline.</p>
       <p class="shortcuts"><kbd>←</kbd><kbd>→</kbd> navigate <kbd>S</kbd> source <kbd>M</kbd> minimal <kbd>T</kbd> theme <kbd>/</kbd> search</p>
-      <p class="offline-note">KJV · Geneva 1599 · no internet needed · <a href="https://jesuspeoplesf.com/donate/" target="_blank" rel="noopener noreferrer">Donate</a></p>
+      <p class="offline-note" data-testid="footer-version">Verse __VERSE_VERSION__ · KJV · Geneva 1599 · no internet needed · <a href="https://jesuspeoplesf.com/donate/" target="_blank" rel="noopener noreferrer">Donate</a></p>
     </footer>
     <noscript>This reader requires JavaScript to load verses from its local data files.</noscript>
   </body>

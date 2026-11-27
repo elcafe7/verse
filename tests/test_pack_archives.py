@@ -17,6 +17,7 @@ from pack_archives import (  # noqa: E402
     date_from_tag,
     folder_name,
     read_tag,
+    safe_under,
 )
 
 TAG = "offline-20261125-1"
@@ -76,6 +77,18 @@ class PackArchivesTests(unittest.TestCase):
         self.assertEqual(raw[:3], b"\x1f\x8b\x08")
         self.assertEqual(raw[3] & 0x08, 0)
         self.assertEqual(raw[4:8], b"\0\0\0\0")
+
+
+    def test_safe_under_stays_inside_and_rejects_escapes(self):
+        dest = safe_under(self.out, "verse-offline-20261125.tar.gz", what="tar.gz path")
+        self.assertTrue(dest.startswith(str(self.out.resolve()) + "/"))
+        self.assertTrue(dest.endswith("verse-offline-20261125.tar.gz"))
+        with self.assertRaises(SystemExit):
+            safe_under(self.out, "../secret.tar.gz", what="tar.gz path")
+        with self.assertRaises(SystemExit):
+            safe_under(self.out, "/etc/passwd", what="tar.gz path")
+        with self.assertRaises(SystemExit):
+            safe_under(self.out, "foo\x00bar", what="tar.gz path")
 
 
 if __name__ == "__main__":

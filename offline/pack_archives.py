@@ -61,6 +61,27 @@ def archive_stem(date: str) -> str:
     return f"verse-offline-{date}"
 
 
+def safe_under(base, *parts, what: str = "path") -> str:
+    """Resolve base/parts and require the result to stay under base.
+
+    CodeQL py/path-injection: realpath + commonpath and startswith(base + sep).
+    """
+    base_s = os.fspath(base)
+    if not isinstance(base_s, str) or not base_s or "\0" in base_s:
+        fail(f"{what}: empty path or NUL byte")
+    for part in parts:
+        if not isinstance(part, str) or not part or "\0" in part:
+            fail(f"{what}: empty path or NUL byte")
+    base_real = os.path.realpath(os.path.normpath(base_s))
+    resolved = os.path.realpath(os.path.normpath(os.path.join(base_real, *parts)))
+    if (
+        os.path.commonpath([resolved, base_real]) != base_real
+        or not resolved.startswith(base_real + os.sep)
+    ):
+        fail(f"{what}: {os.path.join(*parts)!r} resolves outside {base_s}")
+    return resolved
+
+
 def collect(src: Path) -> dict[str, bytes]:
     if not (src / "index.html").is_file():
         fail(f"no index.html in {src} (run python3 offline/build_offline.py first)")
@@ -94,11 +115,18 @@ def build(src: Path, out_dir: Path, tag: str, date: str) -> tuple[Path, Path, di
     root = folder_name(tag)
     stem = archive_stem(date)
     mtime = mtime_for(date)
+    out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    zpath = out_dir / f"{stem}.zip"
-    tpath = out_dir / f"{stem}.tar.gz"
+    # Filenames are built only from the DATE_RE-validated date (never the raw
+    # tag / VERSE_OFFLINE_TAG / --out-dir string). Then the joined path is
+    # resolved and required to stay under out_dir.
+    zname, tname = f"{stem}.zip", f"{stem}.tar.gz"
+    if not zname.startswith("verse-offline-") or not tname.startswith("verse-offline-"):
+        fail("archive name must start with verse-offline-")
+    zpath_s = safe_under(out_dir, zname, what="zip path")
+    tpath_s = safe_under(out_dir, tname, what="tar.gz path")
 
-    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+    with zipfile.ZipFile(zpath_s, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
         for name, data in members.items():
             zi = zipfile.ZipInfo(
                 f"{root}/{name}",
@@ -119,10 +147,10 @@ def build(src: Path, out_dir: Path, tag: str, date: str) -> tuple[Path, Path, di
             ti.uid = ti.gid = 0
             ti.uname = ti.gname = "root"
             tf.addfile(ti, io.BytesIO(data))
-    with tpath.open("wb") as raw:
+    with open(tpath_s, "wb") as raw:
         with gzip.GzipFile(filename="", mode="wb", fileobj=raw, compresslevel=9, mtime=0) as gz:
             gz.write(buf.getvalue())
-    return zpath, tpath, members, root
+    return Path(zpath_s), Path(tpath_s), members, root
 
 
 def main(argv=None) -> None:

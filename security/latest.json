@@ -1,8 +1,8 @@
 {
-  "tag": "offline-20261125",
-  "timestamp": "20261125T205044Z",
-  "date_utc": "2026-11-25T20:50:44Z",
+  "tag": "offline-20261125-1",
+  "timestamp": "20261126T001836Z",
+  "date_utc": "2026-11-26T00:18:36Z",
   "result": "pass",
-  "folder": "reports/offline-20261125_20261125T205044Z",
-  "summary": "reports/offline-20261125_20261125T205044Z/summary.md"
+  "folder": "reports/offline-20261125-1_20261126T001836Z",
+  "summary": "reports/offline-20261125-1_20261126T001836Z/summary.md"
 }

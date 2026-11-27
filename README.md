@@ -49,7 +49,7 @@ Open **[apocalypse.press/verse](https://apocalypse.press/verse/)** in any browse
 Want to read with no internet, or with fewer distractions? Download Verse once and keep it.
 
 1. **Download** [verse-offline-20261125.zip](https://github.com/elcafe7/verse/releases/latest/download/verse-offline-20261125.zip) (about 8 MB).
-2. **Unzip it.** You get one folder called `dist`.
+2. **Unzip it.** You get one folder called `verse-offline-20261125-1`.
 3. **Open `index.html`** inside that folder by double-clicking it. It opens in Chrome, Edge, Safari, or Firefox.
 4. **That's it.** It works with no internet connection. Keep `index.html` in the folder with its `data` folder and other files.
 
@@ -110,7 +110,7 @@ The offline download is built from the private `verse_web` repo (`offline/build_
 
 ```sh
 tar -xzf verse-offline-20261125.tar.gz
-xdg-open dist/index.html   # works over file://, USB stick, airplane mode
+xdg-open verse-offline-20261125-1/index.html   # works over file://, USB stick, airplane mode
 ```
 
 ### Terminal reader features

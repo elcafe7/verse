@@ -32,6 +32,7 @@ class VersionDisplayTests(unittest.TestCase):
             readme,
         )
         self.assertIn(f"<sub>{tag} · verse-offline-", readme)
+        self.assertIn(f"one folder called `verse-{tag}`", readme)
 
     def test_env_overrides_version_file(self):
         self.assertEqual(

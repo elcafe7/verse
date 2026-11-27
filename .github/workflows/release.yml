@@ -3,7 +3,7 @@
 # Tag push (offline-YYYYMMDD or offline-YYYYMMDD-N): build the offline reader
 # with offline/build_offline.py (stdlib only; public-domain editions only:
 # kjv, kj16, gen + Hebrew/Greek sources), package it exactly like the
-# existing releases (verse-offline-<DATE>.tar.gz and .zip, top-level dist/),
+# existing releases (verse-offline-<DATE>.tar.gz and .zip, unpacking to verse-<tag>/),
 # resolve requirements.txt into a lockfile in a clean venv, then the checks
 # below.
 #
@@ -120,13 +120,15 @@ jobs:
       - name: Build the offline reader and package it
         env:
           PREFIX: ${{ steps.meta.outputs.prefix }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          DATE: ${{ steps.meta.outputs.date }}
         run: |
           python3 offline/build_offline.py
-          # Same layout as earlier releases: one top-level dist/ folder.
-          epoch="$(git log -1 --format=%ct)"
-          tar --sort=name --owner=0 --group=0 --numeric-owner --mtime="@${epoch}" \
-            -C offline -cf - dist | gzip -n > "dist/${PREFIX}.tar.gz"
-          (cd offline && find dist -exec touch -d "@${epoch}" {} + && find dist | sort | zip -qX -@ "../dist/${PREFIX}.zip")
+          # Archives keep the verse-offline-<date> download names; they unpack
+          # to a single verse-<tag>/ folder (for example verse-offline-20261125-1/).
+          python3 offline/pack_archives.py --src offline/dist --out-dir dist --tag "$TAG" --date "$DATE"
+          test -f "dist/${PREFIX}.zip"
+          test -f "dist/${PREFIX}.tar.gz"
           ls -l dist
 
       - name: Stage SBOM input (offline bundle + resolved lockfile)
@@ -141,15 +143,16 @@ jobs:
       - name: Release notes intro
         env:
           PREFIX: ${{ steps.meta.outputs.prefix }}
+          TAG: ${{ steps.meta.outputs.tag }}
         run: |
           mkdir -p notes
           cat > notes/intro.md <<EOF
           Fully-offline reader: KJV + KJ1611 with Apocrypha + Geneva 1599 with Apocrypha + Hebrew/Greek sources with transliteration. No dependencies, no internet needed.
 
-          Unpack and open dist/index.html (works over file://):
+          Unpack and open verse-${TAG}/index.html (works over file://):
 
               tar -xzf ${PREFIX}.tar.gz
-              xdg-open dist/index.html
+              xdg-open verse-${TAG}/index.html
 
           No tar? Use ${PREFIX}.zip instead.
           EOF
